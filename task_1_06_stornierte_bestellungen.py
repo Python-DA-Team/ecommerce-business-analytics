@@ -34,7 +34,7 @@ JOIN categories cat
 df = pd.read_sql(query, conn)
 
 
-# Частка скасованих замовлень
+# Anteil stornierter Bestellungen
 
 orders_status = (
     df.groupby(["order_id", "status"])
@@ -50,11 +50,11 @@ cancelled_orders = orders_status[
 
 cancel_rate = cancelled_orders / total_orders * 100
 
-print(f"Всього замовлень: {total_orders}")
-print(f"Скасовано: {cancelled_orders}")
-print(f"Частка скасованих: {cancel_rate:.2f}%")
+print(f"Bestellungen insgesamt: {total_orders}")
+print(f"Stornierte Bestellungen: {cancelled_orders}")
+print(f"Stornoquote: {cancel_rate:.2f}%")
 
-# Категорія -> ймовірність скасування
+# Stornoanteil nach Kategorie auf Positionsebene
 
 category_cancel = (
     df.groupby(["category", "status"])
@@ -83,7 +83,7 @@ print(category_pivot.sort_values(
     ascending=False
 ))
 
-# Сегмент -> скасування
+# Stornoanteil nach Kundensegment
 
 segment_cancel = (
     df.groupby(["segment", "status"])
@@ -109,7 +109,7 @@ segment_pivot["cancel_rate"] = (
 
 print(segment_pivot)
 
-# Країна -> скасування
+# Stornoanteil nach Lieferland
 
 country_cancel = (
     df.groupby(["ship_country", "status"])
@@ -140,7 +140,7 @@ print(
     )
 )
 
-# Втрачений revenue
+# Wert der stornierten Bestellpositionen
 
 lost_revenue = (
     df[df["status"].str.lower() == "cancelled"]
@@ -148,10 +148,10 @@ lost_revenue = (
     .sum()
 )
 
-print("\nВтрачений revenue:")
+print("\nWert der stornierten Bestellpositionen:")
 print(round(lost_revenue, 2))
 
-# Товари які скасовують найчастіше
+# Am häufigsten stornierte Produkte
 
 most_cancelled_products = (
     df[df["status"].str.lower() == "cancelled"]
@@ -167,7 +167,7 @@ most_cancelled_products = (
     )
 )
 
-print("\nТоп товарів по скасуваннях:")
+print("\nProdukte mit den meisten stornierten Positionen:")
 print(most_cancelled_products.head(20))
 
 # Stacked Bar
@@ -184,14 +184,14 @@ category_status.plot(
     figsize=(12, 6)
 )
 
-plt.title("Status по категоріях")
-plt.xlabel("Category")
-plt.ylabel("Orders")
+plt.title("Bestellstatus nach Kategorie")
+plt.xlabel("Kategorie")
+plt.ylabel("Bestellpositionen")
 plt.xticks(rotation=45)
 plt.tight_layout()
 plt.show()
 
-# Heatmap скасувань по країнах
+# Heatmap der Bestellpositionen nach Lieferland und Status
 
 heatmap_data = (
     df.groupby(["ship_country", "status"])
@@ -208,7 +208,7 @@ sns.heatmap(
     cmap="Reds"
 )
 
-plt.title("Скасування по країнах")
+plt.title("Bestellpositionen nach Lieferland und Status")
 plt.show()
 
 conn.close()

@@ -13,7 +13,7 @@ df_products = pd.read_sql_query("SELECT * FROM products", conn)
 if 'name' in df_products.columns:
     df_products = df_products.rename(columns={'name': 'product_name'})
 elif 'product_name' not in df_products.columns:
-    df_products['product_name'] = 'Product ' + df_products['product_id'].astype(str)
+    df_products['product_name'] = "Produkt " + df_products['product_id'].astype(str)
 
 df = df_order_items.merge(df_orders, on='order_id', how='inner')
 df = df.merge(df_products[['product_id', 'product_name', 'category_id']], on='product_id', how='inner')
@@ -55,36 +55,36 @@ electronics_monthly = df_electronics.groupby(df_electronics['order_date'].dt.mon
 weekday_avg = df_daily.groupby('weekday')['revenue'].mean().reindex(
     ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 )
-print("\n Средняя выручка по дням недели:")
+print("\n Durchschnittlicher Umsatz nach Wochentag:")
 print(weekday_avg.to_string())
 
-print("\n Выявленные аномальные дни (Топ-5 отклонений):")
+print("\n Auffällige Tage (Top 5 der positiven Abweichungen):")
 if not anomalies.empty:
     print(anomalies[['revenue', 'residual']].sort_values(by='residual', ascending=False).head(5).to_string())
 else:
-    print("Явных изолированных аномалий не обнаружено.")
+    print("Keine deutlichen isolierten Ausreißer gefunden.")
 
 fig, axes = plt.subplots(4, 1, figsize=(12, 10), sharex=True)
 
-axes[0].plot(df_daily.index, df_daily['revenue'], color='#1f77b4', alpha=0.6, label='Фактическая выручка ($)')
-axes[0].set_title('Разложение временного ряда выручки (Time Series Decomposition)', fontsize=14, pad=10)
+axes[0].plot(df_daily.index, df_daily['revenue'], color='#1f77b4', alpha=0.6, label="Beobachteter Umsatz ($)")
+axes[0].set_title("Zerlegung der Umsatzzeitreihe", fontsize=14, pad=10)
 axes[0].legend(loc='upper left')
 axes[0].grid(True, linestyle=':', alpha=0.5)
 
-axes[1].plot(df_daily.index, df_daily['trend'], color='#d62728', linewidth=2, label='Годовой тренд (Trend)')
+axes[1].plot(df_daily.index, df_daily['trend'], color='#d62728', linewidth=2, label="Trend: zentrierter 7-Tage-Mittelwert")
 axes[1].legend(loc='upper left')
 axes[1].grid(True, linestyle=':', alpha=0.5)
 
-axes[2].plot(df_daily.index, df_daily['seasonal'], color='#2ca02c', label='Недельная сезонность (Seasonal)')
+axes[2].plot(df_daily.index, df_daily['seasonal'], color='#2ca02c', label="Wochentagseffekt")
 axes[2].legend(loc='upper left')
 axes[2].grid(True, linestyle=':', alpha=0.5)
 
-axes[3].scatter(df_daily.index, df_daily['residual'], color='#9467bd', alpha=0.5, s=12, label='Остатки (Residual / Шум)')
+axes[3].scatter(df_daily.index, df_daily['residual'], color='#9467bd', alpha=0.5, s=12, label="Residuen")
 if not anomalies.empty:
-    axes[3].scatter(anomalies.index, anomalies['residual'], color='red', s=35, edgecolor='black', label='Выявленные аномалии (Пики)')
+    axes[3].scatter(anomalies.index, anomalies['residual'], color='red', s=35, edgecolor='black', label="Erkannte Ausreißer")
 axes[3].legend(loc='upper left')
 axes[3].grid(True, linestyle=':', alpha=0.5)
-axes[3].set_xlabel('Дата заказа')
+axes[3].set_xlabel("Bestelldatum")
 
 plt.tight_layout()
 plt.savefig('revenue_decomposition_linear.png', dpi=300)
@@ -99,19 +99,19 @@ df_year['day_of_week_num'] = df_year.index.dayofweek
 cal_pivot = df_year.pivot_table(index='day_of_week_num', columns='week_of_year', values='revenue', aggfunc='sum').fillna(0)
 
 plt.figure(figsize=(15, 4))
-days_labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+days_labels = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
 
 sns.heatmap(
     cal_pivot,
     cmap='YlOrRd',
     linewidths=0.5,
     linecolor='white',
-    cbar_kws={'label': 'Дневная выручка ($)', 'orientation': 'horizontal', 'pad': 0.2}
+    cbar_kws={'label': "Tagesumsatz ($)", 'orientation': 'horizontal', 'pad': 0.2}
 )
 
-plt.title(f'Календарный Heatmap выручки за {latest_year} год (Дни недели × Недели года)', fontsize=14, pad=15)
-plt.ylabel('День недели')
-plt.xlabel('Порядковый номер недели в году')
+plt.title(f"Umsatzkalender {latest_year}: Wochentage und Kalenderwochen", fontsize=14, pad=15)
+plt.ylabel("Wochentag")
+plt.xlabel("Kalenderwoche")
 plt.yticks(np.arange(7) + 0.5, days_labels, rotation=0)
 plt.tight_layout()
 
@@ -122,13 +122,13 @@ plt.figure(figsize=(10, 5))
 x_indexes = np.arange(len(months_order))
 width = 0.35
 
-plt.bar(x_indexes - width/2, sports_monthly, width, label='Sports', color='orange', alpha=0.8)
-plt.bar(x_indexes + width/2, electronics_monthly, width, label='Electronics', color='teal', alpha=0.8)
+plt.bar(x_indexes - width/2, sports_monthly, width, label="Sport", color='orange', alpha=0.8)
+plt.bar(x_indexes + width/2, electronics_monthly, width, label="Elektronik", color='teal', alpha=0.8)
 
-plt.title('Проверка сезонности категорий товаров (Продажи по месяцам)')
-plt.xticks(x_indexes, [m[:3] for m in months_order])
-plt.xlabel('Месяц')
-plt.ylabel('Выручка ($)')
+plt.title("Saisonverlauf der Produktkategorien nach Monat")
+plt.xticks(x_indexes, ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"])
+plt.xlabel("Monat")
+plt.ylabel("Umsatz ($)")
 plt.legend()
 plt.grid(axis='y', linestyle=':', alpha=0.5)
 plt.tight_layout()

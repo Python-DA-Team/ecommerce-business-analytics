@@ -44,7 +44,7 @@ df = pd.read_sql(query, conn)
 df["order_date"] = pd.to_datetime(df["order_date"])
 df["order_day"] = pd.to_datetime(df["order_day"])
 
-# 1. Клієнт з найбільшою кількістю замовлень за один день
+# 1. Kunden mit den meisten Bestellungen an einem Tag
 
 daily_orders = (
     df.groupby(
@@ -69,13 +69,13 @@ top_clients = daily_orders[
     daily_orders["orders_count"] == max_orders
 ]
 
-print("\nКлієнт(и) з найбільшою кількістю замовлень за один день:")
+print("\nKunden mit den meisten Bestellungen an einem Tag:")
 print(top_clients.to_string(index=False))
 
 target_customer = top_clients.iloc[0]["customer_id"]
 target_day = top_clients.iloc[0]["order_day"]
 
-# 2. Деталі по клієнту у день аномалії
+# 2. Details zum ausgewählten Kunden am auffälligen Tag
 
 client_day_orders = df[
     (df["customer_id"] == target_customer)
@@ -86,20 +86,20 @@ orders_count = client_day_orders["order_id"].nunique()
 total_revenue = client_day_orders["item_revenue"].sum()
 total_quantity = client_day_orders["quantity"].sum()
 
-print("\nОбраний клієнт:")
-print("Customer ID:", target_customer)
-print("Дата:", target_day.date())
+print("\nAusgewählter Kunde:")
+print("Kunden-ID:", target_customer)
+print("Datum:", target_day.date())
 
-print("\nКількість замовлень:")
+print("\nAnzahl der Bestellungen:")
 print(orders_count)
 
-print("\nЗагальна сума:")
+print("\nGesamtwert:")
 print(round(total_revenue, 2))
 
-print("\nЗагальна кількість товарних одиниць:")
+print("\nGesamtzahl der bestellten Einheiten:")
 print(total_quantity)
 
-# 3. Усі товари клієнта у день аномалії
+# 3. Produkte des Kunden am auffälligen Tag
 
 products = (
     client_day_orders.groupby(
@@ -119,13 +119,13 @@ products = (
     )
 )
 
-print("\nУсі товари клієнта в день аномалії:")
+print("\nProdukte des Kunden am auffälligen Tag:")
 print(products.to_string(index=False))
 
-print("\nКількість різних товарів:")
+print("\nAnzahl unterschiedlicher Produkte:")
 print(products["product_name"].nunique())
 
-# 4. Спосіб оплати
+# 4. Zahlungsarten
 
 payments = (
     client_day_orders.groupby("payment_method")
@@ -137,10 +137,10 @@ payments = (
     .sort_values("orders_count", ascending=False)
 )
 
-print("\nСпособи оплати:")
+print("\nZahlungsarten:")
 print(payments.to_string(index=False))
 
-# 5. Повернення клієнта
+# 5. Retouren des Kunden
 
 returns_query = """
 SELECT
@@ -162,7 +162,7 @@ returns_df = pd.read_sql(
     params=(int(target_customer),)
 )
 
-print("\nПовернення клієнта:")
+print("\nRetouren des Kunden:")
 if len(returns_df) > 0:
     print(returns_df.to_string(index=False))
 
@@ -176,12 +176,12 @@ if len(returns_df) > 0:
         .sort_values("returns_count", ascending=False)
     )
 
-    print("\nПричини повернень:")
+    print("\nRetourengründe:")
     print(reasons.to_string(index=False))
 else:
-    print("Повернень не знайдено")
+    print("Keine Retouren gefunden.")
 
-# 6. Історія замовлень клієнта по днях
+# 6. Bestellhistorie des Kunden nach Tag
 
 history = (
     df[df["customer_id"] == target_customer]
@@ -194,7 +194,7 @@ history = (
     .sort_values("order_day")
 )
 
-print("\nІсторія замовлень клієнта:")
+print("\nBestellhistorie des Kunden:")
 print(history.to_string(index=False))
 
 plt.figure(figsize=(12, 6))
@@ -209,18 +209,18 @@ sns.lineplot(
 plt.axvline(
     target_day,
     linestyle="--",
-    label="Аномальний день"
+    label="Auffälliger Tag"
 )
 
-plt.title("Історія замовлень клієнта по днях")
-plt.xlabel("Дата")
-plt.ylabel("Кількість замовлень")
+plt.title("Bestellhistorie des Kunden nach Tag")
+plt.xlabel("Datum")
+plt.ylabel("Anzahl der Bestellungen")
 plt.xticks(rotation=45)
 plt.legend()
 plt.tight_layout()
 plt.show()
 
-# 7. Висновок: оптовий клієнт чи фрод
+# 7. Regelbasierte Einordnung der Kundenaktivität
 
 total_orders = df[
     df["customer_id"] == target_customer
@@ -232,21 +232,21 @@ active_days = df[
 
 returns_count = len(returns_df)
 
-print("\nПоказники для висновку:")
-print("Усього замовлень:", total_orders)
-print("Активних днів:", active_days)
-print("Повернень:", returns_count)
-print("Revenue у день аномалії:", round(total_revenue, 2))
+print("\nKennzahlen für die Einordnung:")
+print("Bestellungen insgesamt:", total_orders)
+print("Aktive Tage:", active_days)
+print("Retouren:", returns_count)
+print("Umsatz am auffälligen Tag:", round(total_revenue, 2))
 
-print("\nВисновок:")
+print("\nEinordnung:")
 
 if active_days > 5 and returns_count == 0:
-    print("Ймовірно справжній оптовий клієнт: є активність у різні дні та немає повернень.")
+    print("Möglicher Großkunde: Aktivität an mehreren Tagen und keine Retouren.")
 elif active_days <= 2 and returns_count > 0:
-    print("Є ризик фроду: багато замовлень сконцентровані в короткий період і є повернення.")
+    print("Prüfhinweis: Viele Bestellungen in einem kurzen Zeitraum und vorhandene Retouren.")
 elif orders_count >= 5 and active_days <= 2:
-    print("Підозріла активність: багато замовлень за один день, але мало активних днів.")
+    print("Auffällige Aktivität: Viele Bestellungen an einem Tag, aber wenige aktive Tage.")
 else:
-    print("Ознак явного фроду недостатньо, але клієнта варто перевірити вручну.")
+    print("Keine ausreichenden Hinweise auf Betrug; eine manuelle Prüfung bleibt sinnvoll.")
 
 conn.close()

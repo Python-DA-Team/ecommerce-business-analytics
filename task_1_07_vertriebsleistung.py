@@ -1,14 +1,14 @@
-# 1.7 Sales Performance співробітників
-# Об'єднати employees, orders, order_items.
-# Проаналізувати:
-# Хто з менеджерів приносить найбільший revenue
-# У кого найнижчий % скасувань
-# Середній чек замовлень на співробітника
-# Розподіл revenue по регіонах менеджерів
-# Який менеджер залучив найбільше повторних клієнтів
-# Візуалізація:
-# Горизонтальний bar chart рейтингу
-# Scatter plot (revenue vs cancellation %) по співробітниках
+# 1.7 Vertriebsleistung der Mitarbeitenden
+# employees, orders und order_items verknüpfen.
+# Analysefragen:
+# Welche Mitarbeitenden erzielen den höchsten Umsatz?
+# Wer hat die niedrigste Stornoquote?
+# Durchschnittlicher Bestellwert je Mitarbeitendem
+# Umsatzverteilung nach Vertriebsregion
+# Welche Mitarbeitenden betreuen die meisten Wiederkäufer?
+# Visualisierung:
+# Horizontales Balkendiagramm der Rangfolge
+# Streudiagramm: Umsatz und Stornoquote je Mitarbeitendem
 
 
 import sqlite3
@@ -54,7 +54,7 @@ df["revenue"] = (
 )
 
 
-# 1. Хто з менеджерів приносить найбільший revenue
+# 1. Umsatz nach Mitarbeitendem
 employee_revenue = (
     df.groupby("employee_name", as_index=False)
       .agg(revenue=("revenue", "sum"))
@@ -64,7 +64,7 @@ employee_revenue = (
 print(employee_revenue)
 
 
-# 2. У кого найнижчий % скасувань
+# 2. Stornoquote nach Mitarbeitendem
 orders_status = (
     df[["employee_name", "order_id", "status"]]
       .drop_duplicates()
@@ -93,7 +93,7 @@ cancellation = (
 print(cancellation)
 
 
-# 3. Середній чек замовлень на співробітника
+# 3. Durchschnittlicher Bestellwert je Mitarbeitendem
 order_totals = (
     df.groupby(
         ["employee_name", "order_id"],
@@ -111,7 +111,7 @@ avg_check = (
 print(avg_check)
 
 
-# 4. Revenue по регіонах менеджерів
+# 4. Umsatz nach Vertriebsregion
 region_revenue = (
     df.groupby("region", as_index=False)
       .agg(revenue=("revenue", "sum"))
@@ -121,7 +121,7 @@ region_revenue = (
 print(region_revenue)
 
 
-# 5. Хто залучив найбільше повторних клієнтів
+# 5. Wiederkäufer nach Mitarbeitendem
 customer_orders = (
     df[["customer_id", "order_id"]]
       .drop_duplicates()
@@ -157,7 +157,7 @@ repeat_clients = (
 print(repeat_clients)
 
 
-# 6. Горизонтальний рейтинг менеджерів
+# 6. Umsatzrangfolge der Mitarbeitenden
 top_managers = employee_revenue.head(10)
 
 plt.figure(figsize=(10, 6))
@@ -168,9 +168,9 @@ sns.barplot(
     y="employee_name"
 )
 
-plt.title("Managers Revenue Ranking")
-plt.xlabel("Revenue")
-plt.ylabel("Manager")
+plt.title("Umsatzrangfolge der Mitarbeitenden")
+plt.xlabel("Umsatz")
+plt.ylabel("Mitarbeitende")
 
 plt.tight_layout()
 plt.show()
@@ -196,11 +196,11 @@ sns.scatterplot(
 )
 
 plt.title(
-    "Revenue vs Cancellation Rate"
+    "Umsatz und Stornoquote"
 )
 
-plt.xlabel("Cancellation %")
-plt.ylabel("Revenue")
+plt.xlabel("Stornoquote (%)")
+plt.ylabel("Umsatz")
 
 plt.tight_layout()
 plt.show()

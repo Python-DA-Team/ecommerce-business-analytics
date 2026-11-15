@@ -14,15 +14,15 @@ DB_PATH = "online_store.db"
 conn = sqlite3.connect(DB_PATH)
 
 
-# ---------
-# ДОДАТКОВЕ ЗАВДАННЯ 1
-# HR-відділ повідомив про підозрілу аномалію — у деяких співробітників бонус більший за
-# base_salary. Терміново (!) потрібно:  1. Знайти всіх співробітників,
-# де bonus > base_salary 2. Побудувати scatter plot (base_salary vs bonus) з лінією y=x 3.
-# Порахувати середній бонус по регіонах та посадах (title) 4.
-# Перевірити, чи є співробітники з однаковою посадою, але суттєво різними зарплатами
-# — можливо, дискримінація?
-# ----------
+
+# Zusatzaufgabe 1: HR-Analyse
+# Auffällige Bonuszahlungen im Verhältnis zum Grundgehalt untersuchen.
+# 1. Mitarbeitende mit bonus > base_salary ermitteln.
+# 2. Grundgehalt und Bonus mit der Referenzlinie y = x darstellen.
+# 3. Durchschnittliche Boni nach Region und Position berechnen.
+# 4. Gehaltsunterschiede innerhalb derselben Position vergleichen.
+# Unterschiede sind ein Prüfhinweis und kein Nachweis einer Diskriminierung.
+
 
 employees = pd.read_sql_query("SELECT * FROM employees", conn)
 employee_salaries = pd.read_sql_query("SELECT * FROM employee_salaries", conn)
@@ -36,7 +36,7 @@ data = pd.merge(emp, emp_salaries, on="employee_id")
 
 anomaly = data[data["bonus"] > data["base_salary"]]
 
-print("Аномалії по співробітникам: \n", anomaly)
+print("Auffällige Bonuszahlungen: \n", anomaly)
 
 plt.figure(figsize=(10, 5))
 plt.scatter(data["base_salary"], data["bonus"], alpha=0.6, color="green")
@@ -47,9 +47,9 @@ plt.plot(
     linestyle="--",
     label="y = x"
 )
-plt.xlabel("Base Salary")
+plt.xlabel("Grundgehalt")
 plt.ylabel("Bonus")
-plt.title("Base Salary vs Bonus")
+plt.title("Grundgehalt und Bonus")
 plt.legend()
 plt.tight_layout()
 plt.show()
@@ -57,24 +57,24 @@ plt.show()
 avg_bonus_region = data.groupby("region")["bonus"].mean().round(2)
 avg_bonus_title = data.groupby("title")["bonus"].mean().round(2)
 
-print("Cepeдній бонус по регіонам: \n", avg_bonus_region)
-print("Середній бонус по посадах: \n", avg_bonus_title)
+print("Durchschnittlicher Bonus nach Region: \n", avg_bonus_region)
+print("Durchschnittlicher Bonus nach Position: \n", avg_bonus_title)
 
 salary_var = data.groupby("title")["base_salary"].agg(["min", "max", "mean", "std"]).round(2)
 salary_var["range"] = (salary_var["mean"] - salary_var["min"]).round(2)
 
-print("Варіації зарплат за посадами: \n", salary_var.sort_values(by="range", ascending=False))
+print("Gehaltsunterschiede nach Position: \n", salary_var.sort_values(by="range", ascending=False))
 
 
-# ------
-# Додаткове завдання 2
-# Шеф хоче один простий графік для презентації на раді директорів —
-# «які промоакції дають найбільший обсяг продажів?».  1. Згрупувати order_items
-# по promotion_id, порахувати сумарний revenue та сумарний discount 2. Об'єднати
-# з таблицею promotions (назва акції, discount_pct) 3. Побудувати horizontal bar
-# chart — revenue по промоакціях (тільки ТОП-5) 4. На цьому ж графіку показати
-# discount_pct кольором 5. Вивести таблицю з назвою акції, revenue, знижкою)
-# -----
+
+# Zusatzaufgabe 2: Übersicht der Rabattaktionen
+# Die Geschäftsleitung benötigt eine übersichtliche Umsatzgrafik.
+# 1. Bestellpositionen nach promotion_id gruppieren.
+# 2. Umsatz und Rabattbetrag je Aktion summieren.
+# 3. Mit promotions verknüpfen und die fünf führenden Aktionen auswählen.
+# 4. Umsatz als horizontale Balken und Rabatt über die Farbe darstellen.
+# 5. Aktionsname, Umsatz und Rabatt ausgeben.
+
 
 query = """
 SELECT
@@ -102,7 +102,7 @@ top5 = (
       .head(5)
 )
 
-print("\nTOP-5 promotions by revenue:")
+print("\nDie fünf umsatzstärksten Rabattaktionen:")
 print(
     top5[["promotion_name", "revenue", "discount_pct"]]
 )
@@ -117,24 +117,24 @@ sns.barplot(
     dodge=False
 )
 
-plt.title("Top 5 Promotions by Revenue")
-plt.xlabel("Revenue")
-plt.ylabel("Promotion")
-plt.legend(title="Discount %")
+plt.title("Die fünf umsatzstärksten Rabattaktionen")
+plt.xlabel("Umsatz")
+plt.ylabel("Rabattaktion")
+plt.legend(title="Rabatt (%)")
 
 plt.tight_layout()
 plt.show()
 
 
-# -----
-# Додаткове завдання 3
-# Система зафіксувала клієнта, який зробив аномально багато замовлень за один день.
-# Терміново потрібен звіт.  1. Знайти клієнта (або клієнтів) з найбільшою кількістю
-# замовлень за один день 2. Розрахувати: скільки замовлень, на яку суму, які товари,
-# який спосіб оплати 3. Чи є в цього клієнта повернення? Якщо так — яка причина? 4.
-# Побудувати його історію замовлень (графік кількості замовлень по днях) 5.
-# Висновок: це справжній оптовий клієнт чи фрод?
-# ---------
+
+# Zusatzaufgabe 3: Auffällige Bestellaktivität
+# Kunden mit ungewöhnlich vielen Bestellungen an einem Tag untersuchen.
+# 1. Kunden und Tage mit der maximalen Bestellanzahl ermitteln.
+# 2. Bestellanzahl, Gesamtwert und gekaufte Produkte auswerten.
+# 3. Zahlungsarten und vorhandene Retourengründe prüfen.
+# 4. Die tägliche Bestellhistorie visualisieren.
+# 5. Aktivität regelbasiert einordnen und manuell prüfen.
+
 
 query = """
 SELECT
@@ -194,7 +194,7 @@ top_clients = daily_orders[
     daily_orders["orders_count"] == max_orders
 ]
 
-print("\nКлієнт(и) з найбільшою кількістю замовлень за один день:")
+print("\nKunden mit den meisten Bestellungen an einem Tag:")
 print(top_clients.to_string(index=False))
 
 target_customer = top_clients.iloc[0]["customer_id"]
@@ -209,17 +209,17 @@ orders_count = client_day_orders["order_id"].nunique()
 total_revenue = client_day_orders["item_revenue"].sum()
 total_quantity = client_day_orders["quantity"].sum()
 
-print("\nОбраний клієнт:")
-print("Customer ID:", target_customer)
-print("Дата:", target_day.date())
+print("\nAusgewählter Kunde:")
+print("Kunden-ID:", target_customer)
+print("Datum:", target_day.date())
 
-print("\nКількість замовлень:")
+print("\nAnzahl der Bestellungen:")
 print(orders_count)
 
-print("\nЗагальна сума:")
+print("\nGesamtwert:")
 print(round(total_revenue, 2))
 
-print("\nЗагальна кількість товарних одиниць:")
+print("\nGesamtzahl der bestellten Einheiten:")
 print(total_quantity)
 
 products = (
@@ -240,10 +240,10 @@ products = (
     )
 )
 
-print("\nУсі товари клієнта в день аномалії:")
+print("\nProdukte des Kunden am auffälligen Tag:")
 print(products.to_string(index=False))
 
-print("\nКількість різних товарів:")
+print("\nAnzahl unterschiedlicher Produkte:")
 print(products["product_name"].nunique())
 
 payments = (
@@ -256,7 +256,7 @@ payments = (
     .sort_values("orders_count", ascending=False)
 )
 
-print("\nСпособи оплати:")
+print("\nZahlungsarten:")
 print(payments.to_string(index=False))
 
 returns_query = """
@@ -279,7 +279,7 @@ returns_df = pd.read_sql(
     params=(int(target_customer),)
 )
 
-print("\nПовернення клієнта:")
+print("\nRetouren des Kunden:")
 if len(returns_df) > 0:
     print(returns_df.to_string(index=False))
 
@@ -293,10 +293,10 @@ if len(returns_df) > 0:
         .sort_values("returns_count", ascending=False)
     )
 
-    print("\nПричини повернень:")
+    print("\nRetourengründe:")
     print(reasons.to_string(index=False))
 else:
-    print("Повернень не знайдено")
+    print("Keine Retouren gefunden.")
 
 history = (
     df[df["customer_id"] == target_customer]
@@ -309,7 +309,7 @@ history = (
     .sort_values("order_day")
 )
 
-print("\nІсторія замовлень клієнта:")
+print("\nBestellhistorie des Kunden:")
 print(history.to_string(index=False))
 
 plt.figure(figsize=(12, 6))
@@ -324,12 +324,12 @@ sns.lineplot(
 plt.axvline(
     target_day,
     linestyle="--",
-    label="Аномальний день"
+    label="Auffälliger Tag"
 )
 
-plt.title("Історія замовлень клієнта по днях")
-plt.xlabel("Дата")
-plt.ylabel("Кількість замовлень")
+plt.title("Bestellhistorie des Kunden nach Tag")
+plt.xlabel("Datum")
+plt.ylabel("Anzahl der Bestellungen")
 plt.xticks(rotation=45)
 plt.legend()
 plt.tight_layout()
@@ -345,25 +345,25 @@ active_days = df[
 
 returns_count = len(returns_df)
 
-print("\nПоказники для висновку:")
-print("Усього замовлень:", total_orders)
-print("Активних днів:", active_days)
-print("Повернень:", returns_count)
-print("Revenue у день аномалії:", round(total_revenue, 2))
+print("\nKennzahlen für die Einordnung:")
+print("Bestellungen insgesamt:", total_orders)
+print("Aktive Tage:", active_days)
+print("Retouren:", returns_count)
+print("Umsatz am auffälligen Tag:", round(total_revenue, 2))
 
-print("\nВисновок:")
+print("\nEinordnung:")
 
 if active_days > 5 and returns_count == 0:
-    print("Ймовірно справжній оптовий клієнт: є активність у різні дні та немає повернень.")
+    print("Möglicher Großkunde: Aktivität an mehreren Tagen und keine Retouren.")
 elif active_days <= 2 and returns_count > 0:
-    print("Є ризик фроду: багато замовлень сконцентровані в короткий період і є повернення.")
+    print("Prüfhinweis: Viele Bestellungen in einem kurzen Zeitraum und vorhandene Retouren.")
 elif orders_count >= 5 and active_days <= 2:
-    print("Підозріла активність: багато замовлень за один день, але мало активних днів.")
+    print("Auffällige Aktivität: Viele Bestellungen an einem Tag, aber wenige aktive Tage.")
 else:
-    print("Ознак явного фроду недостатньо, але клієнта варто перевірити вручну.")
+    print("Keine ausreichenden Hinweise auf Betrug; eine manuelle Prüfung bleibt sinnvoll.")
 
 
-# 1.1 Аналіз продуктового кошика
+# 1.1 Warenkorbanalyse
 
 order_items = pd.read_sql("""
     SELECT order_id, product_id
@@ -410,13 +410,13 @@ pairs_df["lift"] = pairs_df["support"] / (
 
 pairs_df["lift"] = pairs_df["lift"].round(4)
 
-print("Топ-10 пар за Lift:")
+print("Top 10 der Produktpaare nach Lift:")
 print(
     pairs_df.sort_values("lift", ascending=False)
     .head(10)[["product_A", "product_B", "count", "support", "confidence_A_B", "confidence_B_A", "lift"]]
 )
 
-print("\nТоп-10 пар за Support:")
+print("\nTop 10 der Produktpaare nach Support:")
 print(
     pairs_df.sort_values("support", ascending=False)
     .head(10)[["product_A", "product_B", "count", "support"]]
@@ -433,9 +433,9 @@ for (a, b), count in pair_counts.items():
 
 plt.figure(figsize=(12, 10))
 sns.heatmap(matrix, annot=True, fmt="d", cmap="YlGnBu")
-plt.title("Heatmap ко-окупності Top-20 товарів")
-plt.xlabel("Product ID")
-plt.ylabel("Product ID")
+plt.title("Gemeinsame Käufe: Heatmap der 20 häufigsten Produkte")
+plt.xlabel("Produkt-ID")
+plt.ylabel("Produkt-ID")
 plt.tight_layout()
 plt.show()
 
@@ -465,12 +465,12 @@ nx.draw(
     width=edge_widths
 )
 
-plt.title("Network Graph топ-зв'язків між товарами")
+plt.title("Netzwerk der wichtigsten Produktverbindungen")
 plt.show()
 
-print("\nВисновок по парах:")
-print("Товари з найбільшим lift варто пропонувати як cross-sell.")
-print("Товари з найбільшим support варто розміщувати поруч на сайті.")
+print("\nEinordnung der Produktpaare:")
+print("Produkte mit hohem Lift kommen für Cross-Selling-Angebote infrage.")
+print("Produkte mit hohem Support können auf der Website gemeinsam platziert werden.")
 
 triple_counts = Counter()
 
@@ -513,19 +513,19 @@ triples_df["lift"] = triples_df["support"] / (
 
 triples_df["lift"] = triples_df["lift"].round(4)
 
-print("\nТоп-10 трійок за Lift:")
+print("\nTop 10 der Dreierkombinationen nach Lift:")
 print(
     triples_df.sort_values("lift", ascending=False)
     .head(10)[["product_A", "product_B", "product_C", "count", "support", "lift"]]
 )
 
-print("\nТоп-10 трійок за Support:")
+print("\nTop 10 der Dreierkombinationen nach Support:")
 print(
     triples_df.sort_values("support", ascending=False)
     .head(10)[["product_A", "product_B", "product_C", "count", "support"]]
 )
 
-print("\nТоп-10 трійок за Confidence:")
+print("\nTop 10 der Dreierkombinationen: Confidence-Werte:")
 print(
     triples_df.sort_values("support", ascending=False)
     .head(10)[["product_A", "product_B", "product_C", "count", "confidence_A", "confidence_B", "confidence_C"]]
@@ -555,15 +555,15 @@ nx.draw(
     width=edge_widths
 )
 
-plt.title("Network Graph топ-зв'язків між трійками товарів")
+plt.title("Netzwerk der wichtigsten Dreierkombinationen")
 plt.show()
 
-print("\nВисновок по трійках:")
-print("Трійки з найбільшим lift можна використовувати для пакетних пропозицій.")
-print("Трійки з найбільшим support показують найчастіші комбінації товарів.")
+print("\nEinordnung der Dreierkombinationen:")
+print("Dreierkombinationen mit hohem Lift kommen für Paketangebote infrage.")
+print("Dreierkombinationen mit hohem Support zeigen häufig gemeinsam gekaufte Produkte.")
 
 
-# 1.2 Еластичність ціни та глибина знижки
+# 1.2 Rabatthöhe, Absatz und Marge
 
 query = """
 SELECT 
@@ -601,10 +601,10 @@ df["margin"] = (
 
 df["margin_rate"] = df["margin"] / df["revenue"]
 
-print("\nПерші рядки:")
+print("\nErste Datenzeilen:")
 print(df.head())
 
-print("\nОпис знижок:")
+print("\nDeskriptive Statistik der Rabatte:")
 print(df["discount_percent"].describe())
 
 correlation_by_category = (
@@ -617,7 +617,7 @@ correlation_by_category = (
       .sort_values("discount_quantity_corr", ascending=False)
 )
 
-print("\nКореляція між discount % та quantity по категоріях:")
+print("\nKorrelation zwischen Rabatt in Prozent und Absatzmenge je Kategorie:")
 print(correlation_by_category)
 
 bins = [0, 5, 10, 15, 20, 25, 50, 100]
@@ -656,14 +656,14 @@ discount_analysis["margin_rate_total"] = (
     discount_analysis["margin"] / discount_analysis["revenue"]
 )
 
-print("\nАналіз revenue та margin по діапазонах знижок:")
+print("\nUmsatz und Marge nach Rabattbereich:")
 print(discount_analysis)
 
 negative_margin = discount_analysis[
     discount_analysis["margin"] < 0
 ]
 
-print("\nДіапазони, де margin від'ємна:")
+print("\nRabattbereiche mit negativer Marge:")
 print(negative_margin)
 
 safe_discount_analysis = discount_analysis[
@@ -679,7 +679,7 @@ optimal_discount = (
     .reset_index(drop=True)
 )
 
-print("\nОптимальний діапазон знижки по категоріях:")
+print("\nUmsatzstärkster zulässiger Rabattbereich je Kategorie:")
 print(
     optimal_discount[
         [
@@ -707,7 +707,7 @@ g = sns.lmplot(
     line_kws={"color": "red"}
 )
 
-g.set_axis_labels("Discount, %", "Quantity")
+g.set_axis_labels("Rabatt (%)", "Absatzmenge")
 g.set_titles("{col_name}")
 
 plt.tight_layout()
@@ -726,12 +726,12 @@ plt.axhline(
     0.20,
     linestyle="--",
     color="red",
-    label="Minimum safe margin rate 20%"
+    label="Mindestmargenquote: 20 %"
 )
 
-plt.title("Margin rate по діапазонах знижок")
-plt.xlabel("Discount range")
-plt.ylabel("Margin rate")
+plt.title("Margenquote nach Rabattbereich")
+plt.xlabel("Rabattbereich")
+plt.ylabel("Margenquote")
 plt.xticks(rotation=45)
 plt.legend()
 plt.tight_layout()
@@ -746,27 +746,27 @@ sns.barplot(
     hue="category"
 )
 
-plt.title("Revenue по діапазонах знижок")
-plt.xlabel("Discount range")
-plt.ylabel("Revenue")
+plt.title("Umsatz nach Rabattbereich")
+plt.xlabel("Rabattbereich")
+plt.ylabel("Umsatz")
 plt.xticks(rotation=45)
 plt.legend()
 plt.tight_layout()
 plt.show()
 
-print("\nВисновки по оптимальних знижках:")
+print("\nErgebnisse der Rabattbereichsauswahl:")
 
 for _, row in optimal_discount.iterrows():
     print(
-        f"Категорія: {row['category']} | "
-        f"Оптимальний діапазон: {row['discount_range']} | "
-        f"Revenue: {row['revenue']:.2f} | "
-        f"Margin: {row['margin']:.2f} | "
-        f"Margin rate: {row['margin_rate_total']:.2%}"
+        f"Kategorie: {row['category']} | "
+        f"Ausgewählter Rabattbereich: {row['discount_range']} | "
+        f"Umsatz: {row['revenue']:.2f} | "
+        f"Marge: {row['margin']:.2f} | "
+        f"Margenquote: {row['margin_rate_total']:.2%}"
     )
 
 
-# 1.3 Розподіл вартості замовлень та аномалії
+# 1.3 Bestellwerte und Ausreißer
 
 df_orders = pd.read_sql_query("SELECT * FROM orders", conn)
 df_order_items = pd.read_sql_query("SELECT * FROM order_items", conn)
@@ -812,10 +812,10 @@ std_val = values.std()
 df_orders_enriched["z_score"] = np.abs((values - mean_val) / std_val)
 outliers_z = df_orders_enriched[df_orders_enriched["z_score"] > 3]
 
-print("=== СТАТИСТИЧЕСКИЙ АНАЛИЗ И ВЫЯВЛЕНИЕ ВЫБРОСОВ ===")
-print(f"Всего заказов в базе: {len(df_orders_enriched)}")
-print(f"Выбросов по методу IQR (чеки > {upper_bound_iqr:.2f}$): {len(outliers_iqr)}")
-print(f"Выбросов по методу Z-score (сильные аномалии): {len(outliers_z)}")
+print("Statistische Analyse und Erkennung von Ausreißern")
+print(f"Bestellungen im analysierten Datensatz: {len(df_orders_enriched)}")
+print(f"Ausreißer nach IQR (Bestellwert > {upper_bound_iqr:.2f}$): {len(outliers_iqr)}")
+print(f"Ausreißer nach Z-Score: {len(outliers_z)}")
 
 top_1_percent_threshold = values.quantile(0.99)
 df_top_1 = df_orders_enriched[values >= top_1_percent_threshold]
@@ -832,16 +832,16 @@ top_categories = (
     .reset_index()
 )
 
-print(f"\n ПРОФАЙЛ ТОП-1% НАИБОЛЬШИХ ЗАКАЗОВ (Чеки >= {top_1_percent_threshold:.2f}$):")
-print(f"• Top стран доставки:\n{df_top_1['ship_country'].value_counts().head(3).to_string()}")
-print(f"• Топ сегментов клиентов:\n{df_top_1['segment'].value_counts().head(3).to_string()}")
-print(f"• Топ категорий товара по выручке в крупных чеках:\n{top_categories.head(3).to_string(index=False, float_format='%.2f')}")
+print(f"\n Profil der größten 1 % der Bestellungen (Bestellwert >= {top_1_percent_threshold:.2f}$):")
+print(f"• Häufigste Lieferländer:\n{df_top_1['ship_country'].value_counts().head(3).to_string()}")
+print(f"• Häufigste Kundensegmente:\n{df_top_1['segment'].value_counts().head(3).to_string()}")
+print(f"• Umsatzstärkste Kategorien in Großbestellungen:\n{top_categories.head(3).to_string(index=False, float_format='%.2f')}")
 
 df_micro = df_orders_enriched[values < values.quantile(0.01)]
 
-print("\n АНАЛИЗ МИКРОЗАКАЗОВ (Топ-1% снизу):")
-print(f"• Минимальный чек в магазине: {values.min():.2f}$")
-print(f"• Средний чек micro-заказов: {df_micro['order_value'].mean():.2f}$")
+print("\n Analyse der kleinsten Bestellungen (unterstes 1 %):")
+print(f"• Kleinster Bestellwert: {values.min():.2f}$")
+print(f"• Durchschnittlicher Wert der Kleinstbestellungen: {df_micro['order_value'].mean():.2f}$")
 
 customer_order_counts = (
     df_orders_enriched.groupby("customer_id")
@@ -852,8 +852,8 @@ customer_order_counts = (
 df_top_1_with_counts = df_top_1.merge(customer_order_counts, on="customer_id", how="inner")
 one_time_giant_buyers = df_top_1_with_counts[df_top_1_with_counts["total_customer_orders"] == 1]
 
-print("\n КЛИЕНТЫ С ОДНИМ ГИГАНТСКИМ ЗАКАЗОМ (И исчезли):")
-print(f"• Количество таких клиентов: {len(one_time_giant_buyers)}")
+print("\n Kunden mit nur einer Großbestellung im Datensatz:")
+print(f"• Anzahl dieser Kunden: {len(one_time_giant_buyers)}")
 
 if not one_time_giant_buyers.empty:
     print(
@@ -868,11 +868,11 @@ sns.histplot(values[values <= top_1_percent_threshold], bins=40, kde=True, color
 plt.axvline(q1, color="orange", linestyle="--", linewidth=2, label=f"Q1 (25%): {q1:.1f}$")
 plt.axvline(values.median(), color="red", linestyle="-", linewidth=2, label=f"Median (50%): {values.median():.1f}$")
 plt.axvline(q3, color="green", linestyle="--", linewidth=2, label=f"Q3 (75%): {q3:.1f}$")
-plt.axvline(upper_bound_iqr, color="purple", linestyle=":", linewidth=2, label=f"Граница IQR: {upper_bound_iqr:.1f}$")
+plt.axvline(upper_bound_iqr, color="purple", linestyle=":", linewidth=2, label=f"IQR-Obergrenze: {upper_bound_iqr:.1f}$")
 
-plt.title("Распределение стоимости заказов (Гистограмма с квартилями)", fontsize=14, pad=15)
-plt.xlabel("Стоимость заказа ($)", fontsize=12)
-plt.ylabel("Количество заказов", fontsize=12)
+plt.title("Verteilung der Bestellwerte mit Quartilen", fontsize=14, pad=15)
+plt.xlabel("Bestellwert ($)", fontsize=12)
+plt.ylabel("Anzahl der Bestellungen", fontsize=12)
 plt.legend(fontsize=10)
 plt.grid(True, linestyle=":", alpha=0.6)
 plt.tight_layout()
@@ -881,9 +881,9 @@ plt.show()
 plt.figure(figsize=(12, 6))
 sns.boxplot(data=df_orders_enriched, x="segment", y="order_value", palette="Set2", hue="segment", legend=False)
 
-plt.title('Диаграмма "Ящик с усами" (Box Plot) по сегментам покупателей', fontsize=14, pad=15)
-plt.xlabel("Сегмент клиента", fontsize=12)
-plt.ylabel("Стоимость заказа ($)", fontsize=12)
+plt.title("Boxplot der Bestellwerte nach Kundensegment", fontsize=14, pad=15)
+plt.xlabel("Kundensegment", fontsize=12)
+plt.ylabel("Bestellwert ($)", fontsize=12)
 plt.grid(True, linestyle=":", alpha=0.5)
 
 plt.ylim(0, upper_bound_iqr * 2.5)
@@ -891,7 +891,7 @@ plt.tight_layout()
 plt.show()
 
 
-# 1.4 Матриця BCG
+# 1.4 BCG-Portfolio
 
 df_orders = pd.read_sql_query("SELECT * FROM orders", conn)
 df_order_items = pd.read_sql_query("SELECT * FROM order_items", conn)
@@ -900,7 +900,7 @@ df_products = pd.read_sql_query("SELECT * FROM products", conn)
 if "name" in df_products.columns:
     df_products = df_products.rename(columns={"name": "product_name"})
 elif "product_name" not in df_products.columns:
-    df_products["product_name"] = "Product " + df_products["product_id"].astype(str)
+    df_products["product_name"] = "Produkt " + df_products["product_id"].astype(str)
 
 df = df_order_items.merge(df_orders, on="order_id", how="inner")
 df = df.merge(
@@ -961,22 +961,22 @@ share_threshold = product_yearly["market_share"].median()
 
 def classify_bcg(row):
     if row["growth_rate"] >= growth_threshold and row["market_share"] >= share_threshold:
-        return "Зірки"
+        return "Stars"
     elif row["growth_rate"] < growth_threshold and row["market_share"] >= share_threshold:
-        return "Дійні корови"
+        return "Cashcows"
     elif row["growth_rate"] >= growth_threshold and row["market_share"] < share_threshold:
-        return "Знаки питання"
+        return "Fragezeichen"
     else:
-        return "Собаки"
+        return "Arme Hunde"
 
 product_yearly["quadrant"] = product_yearly.apply(classify_bcg, axis=1)
 
 investment_needed = (
-    product_yearly[product_yearly["quadrant"].isin(["Зірки", "Знаки питання"])]
+    product_yearly[product_yearly["quadrant"].isin(["Stars", "Fragezeichen"])]
     .sort_values(by="rev_2025", ascending=False)
 )
 
-print("\nТовари, що потребують інвестицій (Топ-5 за виручкою):")
+print("\nInvestitionskandidaten (Top 5 nach Umsatz):")
 print(
     investment_needed[
         ["product_name", "quadrant", "rev_2025", "growth_rate"]
@@ -984,11 +984,11 @@ print(
 )
 
 to_remove = (
-    product_yearly[product_yearly["quadrant"] == "Собаки"]
+    product_yearly[product_yearly["quadrant"] == "Arme Hunde"]
     .sort_values(by="growth_rate", ascending=True)
 )
 
-print("\nРекомендуються до виведення з асортименту (Топ-5 кандидатів):")
+print("\nKandidaten für eine Sortimentsprüfung (Top 5):")
 print(
     to_remove[
         ["product_name", "rev_2025", "growth_rate", "market_share"]
@@ -998,10 +998,10 @@ print(
 plt.figure(figsize=(12, 8))
 
 colors = {
-    "Зірки": "#2ca02c",
-    "Дійні корови": "#1f77b4",
-    "Знаки питання": "#ff7f0e",
-    "Собаки": "#d62728"
+    "Stars": "#2ca02c",
+    "Cashcows": "#1f77b4",
+    "Fragezeichen": "#ff7f0e",
+    "Arme Hunde": "#d62728"
 }
 
 max_rev = product_yearly["rev_2025"].max()
@@ -1031,7 +1031,7 @@ ymin, ymax = plt.ylim()
 plt.text(
     share_threshold + (xmax - share_threshold) * 0.3,
     growth_threshold + (ymax - growth_threshold) * 0.5,
-    "ЗІРКИ",
+    "STARS",
     fontsize=16,
     fontweight="bold",
     color="green",
@@ -1041,7 +1041,7 @@ plt.text(
 plt.text(
     share_threshold + (xmax - share_threshold) * 0.3,
     growth_threshold - (growth_threshold - ymin) * 0.5,
-    "ДІЙНІ КОРОВИ",
+    "CASHCOWS",
     fontsize=16,
     fontweight="bold",
     color="blue",
@@ -1051,7 +1051,7 @@ plt.text(
 plt.text(
     share_threshold - (share_threshold - xmin) * 0.7,
     growth_threshold + (ymax - growth_threshold) * 0.5,
-    "ЗНАКИ ПИТАННЯ",
+    "FRAGEZEICHEN",
     fontsize=16,
     fontweight="bold",
     color="orange",
@@ -1061,7 +1061,7 @@ plt.text(
 plt.text(
     share_threshold - (share_threshold - xmin) * 0.7,
     growth_threshold - (growth_threshold - ymin) * 0.5,
-    "СОБАКИ",
+    "ARME HUNDE",
     fontsize=16,
     fontweight="bold",
     color="red",
@@ -1086,15 +1086,15 @@ for _, row in top_labelled.iterrows():
         bbox=dict(facecolor="white", alpha=0.8, edgecolor="none", pad=1)
     )
 
-plt.title("BCG матриця: класифікація товарів на квадранти (2024 → 2025)")
-plt.xlabel("Частка ринку в категорії")
-plt.ylabel("Темп росту виручки")
+plt.title("BCG-Portfolio: Produktklassifikation (2024 → 2025)")
+plt.xlabel("Umsatzanteil innerhalb der Kategorie")
+plt.ylabel("Umsatzwachstum")
 plt.grid(True, linestyle=":", alpha=0.6)
 plt.tight_layout()
 plt.show()
 
 
-# 1.5 Календар продажів
+# 1.5 Umsatzkalender
 
 df_orders = pd.read_sql_query("SELECT * FROM orders", conn)
 df_order_items = pd.read_sql_query("SELECT * FROM order_items", conn)
@@ -1103,7 +1103,7 @@ df_products = pd.read_sql_query("SELECT * FROM products", conn)
 if "name" in df_products.columns:
     df_products = df_products.rename(columns={"name": "product_name"})
 elif "product_name" not in df_products.columns:
-    df_products["product_name"] = "Product " + df_products["product_id"].astype(str)
+    df_products["product_name"] = "Produkt " + df_products["product_id"].astype(str)
 
 df = df_order_items.merge(df_orders, on="order_id", how="inner")
 df = df.merge(df_products[["product_id", "product_name", "category_id"]], on="product_id", how="inner")
@@ -1163,39 +1163,39 @@ weekday_avg = df_daily.groupby("weekday")["revenue"].mean().reindex(
     ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 )
 
-print("\n Средняя выручка по дням недели:")
+print("\n Durchschnittlicher Umsatz nach Wochentag:")
 print(weekday_avg.to_string())
 
-print("\n Выявленные аномальные дни (Топ-5 отклонений):")
+print("\n Auffällige Tage (Top 5 der positiven Abweichungen):")
 
 if not anomalies.empty:
     print(anomalies[["revenue", "residual"]].sort_values(by="residual", ascending=False).head(5).to_string())
 else:
-    print("Явных изолированных аномалий не обнаружено.")
+    print("Keine deutlichen isolierten Ausreißer gefunden.")
 
 fig, axes = plt.subplots(4, 1, figsize=(12, 10), sharex=True)
 
-axes[0].plot(df_daily.index, df_daily["revenue"], color="#1f77b4", alpha=0.6, label="Фактическая выручка ($)")
-axes[0].set_title("Разложение временного ряда выручки (Time Series Decomposition)", fontsize=14, pad=10)
+axes[0].plot(df_daily.index, df_daily["revenue"], color="#1f77b4", alpha=0.6, label="Beobachteter Umsatz ($)")
+axes[0].set_title("Zerlegung der Umsatzzeitreihe", fontsize=14, pad=10)
 axes[0].legend(loc="upper left")
 axes[0].grid(True, linestyle=":", alpha=0.5)
 
-axes[1].plot(df_daily.index, df_daily["trend"], color="#d62728", linewidth=2, label="Годовой тренд (Trend)")
+axes[1].plot(df_daily.index, df_daily["trend"], color="#d62728", linewidth=2, label="Trend: zentrierter 7-Tage-Mittelwert")
 axes[1].legend(loc="upper left")
 axes[1].grid(True, linestyle=":", alpha=0.5)
 
-axes[2].plot(df_daily.index, df_daily["seasonal"], color="#2ca02c", label="Недельная сезонность (Seasonal)")
+axes[2].plot(df_daily.index, df_daily["seasonal"], color="#2ca02c", label="Wochentagseffekt")
 axes[2].legend(loc="upper left")
 axes[2].grid(True, linestyle=":", alpha=0.5)
 
-axes[3].scatter(df_daily.index, df_daily["residual"], color="#9467bd", alpha=0.5, s=12, label="Остатки (Residual / Шум)")
+axes[3].scatter(df_daily.index, df_daily["residual"], color="#9467bd", alpha=0.5, s=12, label="Residuen")
 
 if not anomalies.empty:
-    axes[3].scatter(anomalies.index, anomalies["residual"], color="red", s=35, edgecolor="black", label="Выявленные аномалии (Пики)")
+    axes[3].scatter(anomalies.index, anomalies["residual"], color="red", s=35, edgecolor="black", label="Erkannte Ausreißer")
 
 axes[3].legend(loc="upper left")
 axes[3].grid(True, linestyle=":", alpha=0.5)
-axes[3].set_xlabel("Дата заказа")
+axes[3].set_xlabel("Bestelldatum")
 
 plt.tight_layout()
 plt.show()
@@ -1218,19 +1218,19 @@ cal_pivot = (
 
 plt.figure(figsize=(15, 4))
 
-days_labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+days_labels = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
 
 sns.heatmap(
     cal_pivot,
     cmap="YlOrRd",
     linewidths=0.5,
     linecolor="white",
-    cbar_kws={"label": "Дневная выручка ($)", "orientation": "horizontal", "pad": 0.2}
+    cbar_kws={"label": "Tagesumsatz ($)", "orientation": "horizontal", "pad": 0.2}
 )
 
-plt.title(f"Календарный Heatmap выручки за {latest_year} год (Дни недели × Недели года)", fontsize=14, pad=15)
-plt.ylabel("День недели")
-plt.xlabel("Порядковый номер недели в году")
+plt.title(f"Umsatzkalender {latest_year}: Wochentage und Kalenderwochen", fontsize=14, pad=15)
+plt.ylabel("Wochentag")
+plt.xlabel("Kalenderwoche")
 plt.yticks(np.arange(7) + 0.5, days_labels, rotation=0)
 plt.tight_layout()
 plt.show()
@@ -1240,20 +1240,20 @@ plt.figure(figsize=(10, 5))
 x_indexes = np.arange(len(months_order))
 width = 0.35
 
-plt.bar(x_indexes - width / 2, sports_monthly, width, label="Sports", color="orange", alpha=0.8)
-plt.bar(x_indexes + width / 2, electronics_monthly, width, label="Electronics", color="teal", alpha=0.8)
+plt.bar(x_indexes - width / 2, sports_monthly, width, label="Sport", color="orange", alpha=0.8)
+plt.bar(x_indexes + width / 2, electronics_monthly, width, label="Elektronik", color="teal", alpha=0.8)
 
-plt.title("Проверка сезонности категорий товаров (Продажи по месяцам)")
-plt.xticks(x_indexes, [m[:3] for m in months_order])
-plt.xlabel("Месяц")
-plt.ylabel("Выручка ($)")
+plt.title("Saisonverlauf der Produktkategorien nach Monat")
+plt.xticks(x_indexes, ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"])
+plt.xlabel("Monat")
+plt.ylabel("Umsatz ($)")
 plt.legend()
 plt.grid(axis="y", linestyle=":", alpha=0.5)
 plt.tight_layout()
 plt.show()
 
 
-# 1.6 Аналіз скасованих замовлень
+# 1.6 Analyse stornierter Bestellungen
 
 query = """
 SELECT
@@ -1297,9 +1297,9 @@ cancelled_orders = orders_status[
 
 cancel_rate = cancelled_orders / total_orders * 100
 
-print(f"Всього замовлень: {total_orders}")
-print(f"Скасовано: {cancelled_orders}")
-print(f"Частка скасованих: {cancel_rate:.2f}%")
+print(f"Bestellungen insgesamt: {total_orders}")
+print(f"Stornierte Bestellungen: {cancelled_orders}")
+print(f"Stornoquote: {cancel_rate:.2f}%")
 
 category_cancel = (
     df.groupby(["category", "status"])
@@ -1379,7 +1379,7 @@ lost_revenue = (
     .sum()
 )
 
-print("\nВтрачений revenue:")
+print("\nWert der stornierten Bestellpositionen:")
 print(round(lost_revenue, 2))
 
 most_cancelled_products = (
@@ -1393,7 +1393,7 @@ most_cancelled_products = (
     .sort_values("cancellations", ascending=False)
 )
 
-print("\nТоп товарів по скасуваннях:")
+print("\nProdukte mit den meisten stornierten Positionen:")
 print(most_cancelled_products.head(20))
 
 category_status = (
@@ -1408,9 +1408,9 @@ category_status.plot(
     figsize=(12, 6)
 )
 
-plt.title("Status по категоріях")
-plt.xlabel("Category")
-plt.ylabel("Orders")
+plt.title("Bestellstatus nach Kategorie")
+plt.xlabel("Kategorie")
+plt.ylabel("Bestellpositionen")
 plt.xticks(rotation=45)
 plt.tight_layout()
 plt.show()
@@ -1430,11 +1430,11 @@ sns.heatmap(
     cmap="Reds"
 )
 
-plt.title("Скасування по країнах")
+plt.title("Bestellpositionen nach Lieferland und Status")
 plt.show()
 
 
-# 1.7 Sales Performance співробітників
+# 1.7 Vertriebsleistung der Mitarbeitenden
 
 query = """
 SELECT
@@ -1562,9 +1562,9 @@ sns.barplot(
     y="employee_name"
 )
 
-plt.title("Managers Revenue Ranking")
-plt.xlabel("Revenue")
-plt.ylabel("Manager")
+plt.title("Umsatzrangfolge der Mitarbeitenden")
+plt.xlabel("Umsatz")
+plt.ylabel("Mitarbeitende")
 
 plt.tight_layout()
 plt.show()
@@ -1587,9 +1587,9 @@ sns.scatterplot(
     s=120
 )
 
-plt.title("Revenue vs Cancellation Rate")
-plt.xlabel("Cancellation %")
-plt.ylabel("Revenue")
+plt.title("Umsatz und Stornoquote")
+plt.xlabel("Stornoquote (%)")
+plt.ylabel("Umsatz")
 
 plt.tight_layout()
 plt.show()

@@ -13,7 +13,7 @@ df_products = pd.read_sql_query("SELECT * FROM products", conn)
 if "name" in df_products.columns:
     df_products = df_products.rename(columns={"name": "product_name"})
 elif "product_name" not in df_products.columns:
-    df_products["product_name"] = "Product " + df_products["product_id"].astype(str)
+    df_products["product_name"] = "Produkt " + df_products["product_id"].astype(str)
 
 df = df_order_items.merge(df_orders, on="order_id", how="inner")
 df = df.merge(
@@ -74,22 +74,22 @@ share_threshold = product_yearly["market_share"].median()
 
 def classify_bcg(row):
     if row["growth_rate"] >= growth_threshold and row["market_share"] >= share_threshold:
-        return "Зірки"
+        return "Stars"
     elif row["growth_rate"] < growth_threshold and row["market_share"] >= share_threshold:
-        return "Дійні корови"
+        return "Cashcows"
     elif row["growth_rate"] >= growth_threshold and row["market_share"] < share_threshold:
-        return "Знаки питання"
+        return "Fragezeichen"
     else:
-        return "Собаки"
+        return "Arme Hunde"
 
 product_yearly["quadrant"] = product_yearly.apply(classify_bcg, axis=1)
 
 investment_needed = (
-    product_yearly[product_yearly["quadrant"].isin(["Зірки", "Знаки питання"])]
+    product_yearly[product_yearly["quadrant"].isin(["Stars", "Fragezeichen"])]
     .sort_values(by="rev_2025", ascending=False)
 )
 
-print("\nТовари, що потребують інвестицій (Топ-5 за виручкою):")
+print("\nInvestitionskandidaten (Top 5 nach Umsatz):")
 print(
     investment_needed[
         ["product_name", "quadrant", "rev_2025", "growth_rate"]
@@ -97,11 +97,11 @@ print(
 )
 
 to_remove = (
-    product_yearly[product_yearly["quadrant"] == "Собаки"]
+    product_yearly[product_yearly["quadrant"] == "Arme Hunde"]
     .sort_values(by="growth_rate", ascending=True)
 )
 
-print("\nРекомендуються до виведення з асортименту (Топ-5 кандидатів):")
+print("\nKandidaten für eine Sortimentsprüfung (Top 5):")
 print(
     to_remove[
         ["product_name", "rev_2025", "growth_rate", "market_share"]
@@ -111,10 +111,10 @@ print(
 plt.figure(figsize=(12, 8))
 
 colors = {
-    "Зірки": "#2ca02c",
-    "Дійні корови": "#1f77b4",
-    "Знаки питання": "#ff7f0e",
-    "Собаки": "#d62728"
+    "Stars": "#2ca02c",
+    "Cashcows": "#1f77b4",
+    "Fragezeichen": "#ff7f0e",
+    "Arme Hunde": "#d62728"
 }
 
 max_rev = product_yearly["rev_2025"].max()
@@ -144,7 +144,7 @@ ymin, ymax = plt.ylim()
 plt.text(
     share_threshold + (xmax - share_threshold) * 0.3,
     growth_threshold + (ymax - growth_threshold) * 0.5,
-    "ЗІРКИ",
+    "STARS",
     fontsize=16,
     fontweight="bold",
     color="green",
@@ -154,7 +154,7 @@ plt.text(
 plt.text(
     share_threshold + (xmax - share_threshold) * 0.3,
     growth_threshold - (growth_threshold - ymin) * 0.5,
-    "ДІЙНІ КОРОВИ",
+    "CASHCOWS",
     fontsize=16,
     fontweight="bold",
     color="blue",
@@ -164,7 +164,7 @@ plt.text(
 plt.text(
     share_threshold - (share_threshold - xmin) * 0.7,
     growth_threshold + (ymax - growth_threshold) * 0.5,
-    "ЗНАКИ ПИТАННЯ",
+    "FRAGEZEICHEN",
     fontsize=16,
     fontweight="bold",
     color="orange",
@@ -174,7 +174,7 @@ plt.text(
 plt.text(
     share_threshold - (share_threshold - xmin) * 0.7,
     growth_threshold - (growth_threshold - ymin) * 0.5,
-    "СОБАКИ",
+    "ARME HUNDE",
     fontsize=16,
     fontweight="bold",
     color="red",
@@ -199,9 +199,9 @@ for _, row in top_labelled.iterrows():
         bbox=dict(facecolor="white", alpha=0.8, edgecolor="none", pad=1)
     )
 
-plt.title("BCG матриця: класифікація товарів на квадранти (2024 → 2025)")
-plt.xlabel("Частка ринку в категорії")
-plt.ylabel("Темп росту виручки")
+plt.title("BCG-Portfolio: Produktklassifikation (2024 → 2025)")
+plt.xlabel("Umsatzanteil innerhalb der Kategorie")
+plt.ylabel("Umsatzwachstum")
 plt.grid(True, linestyle=":", alpha=0.6)
 plt.tight_layout()
 plt.show()

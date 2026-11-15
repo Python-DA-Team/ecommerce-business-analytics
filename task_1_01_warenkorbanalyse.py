@@ -20,9 +20,9 @@ conn.close()
 
 orders = order_items.groupby("order_id")["product_id"].apply(list)
 
-# =========================
-# Пошук пар товарів
-# =========================
+
+# Warenpaare ermitteln
+
 
 pair_counts = Counter()
 
@@ -62,19 +62,19 @@ pairs_df["lift"] = pairs_df["support"] / (
 
 pairs_df["lift"] = pairs_df["lift"].round(4)
 
-print("Топ-10 пар за Lift:")
+print("Top 10 der Produktpaare nach Lift:")
 print(
     pairs_df.sort_values("lift", ascending=False)
     .head(10)[["product_A", "product_B", "count", "support", "confidence_A_B", "confidence_B_A", "lift"]]
 )
 
-print("\nТоп-10 пар за Support:")
+print("\nTop 10 der Produktpaare nach Support:")
 print(
     pairs_df.sort_values("support", ascending=False)
     .head(10)[["product_A", "product_B", "count", "support"]]
 )
 
-# Heatmap top-20 товарів
+# Heatmap der 20 häufigsten Produkte
 
 top_20_products = product_counts.head(20).index
 
@@ -87,13 +87,13 @@ for (a, b), count in pair_counts.items():
 
 plt.figure(figsize=(12, 10))
 sns.heatmap(matrix, annot=True, fmt="d", cmap="YlGnBu")
-plt.title("Heatmap ко-окупності Top-20 товарів")
-plt.xlabel("Product ID")
-plt.ylabel("Product ID")
+plt.title("Gemeinsame Käufe: Heatmap der 20 häufigsten Produkte")
+plt.xlabel("Produkt-ID")
+plt.ylabel("Produkt-ID")
 plt.tight_layout()
 plt.show()
 
-# Network graph top-30 пар
+# Netzwerk der 30 führenden Produktpaare
 
 top_pairs_30 = pairs_df.sort_values("lift", ascending=False).head(30)
 
@@ -121,17 +121,17 @@ nx.draw(
     width=edge_widths
 )
 
-plt.title("Network Graph топ-зв'язків між товарами")
+plt.title("Netzwerk der wichtigsten Produktverbindungen")
 plt.show()
 
-print("\nВисновок по парах:")
-print("Товари з найбільшим lift варто пропонувати як cross-sell.")
-print("Товари з найбільшим support варто розміщувати поруч на сайті.")
+print("\nEinordnung der Produktpaare:")
+print("Produkte mit hohem Lift kommen für Cross-Selling-Angebote infrage.")
+print("Produkte mit hohem Support können auf der Website gemeinsam platziert werden.")
 
 
-# =========================
-# Пошук трійок товарів
-# =========================
+
+# Produktkombinationen aus drei Artikeln ermitteln
+
 
 triple_counts = Counter()
 
@@ -174,25 +174,25 @@ triples_df["lift"] = triples_df["support"] / (
 
 triples_df["lift"] = triples_df["lift"].round(4)
 
-print("\nТоп-10 трійок за Lift:")
+print("\nTop 10 der Dreierkombinationen nach Lift:")
 print(
     triples_df.sort_values("lift", ascending=False)
     .head(10)[["product_A", "product_B", "product_C", "count", "support", "lift"]]
 )
 
-print("\nТоп-10 трійок за Support:")
+print("\nTop 10 der Dreierkombinationen nach Support:")
 print(
     triples_df.sort_values("support", ascending=False)
     .head(10)[["product_A", "product_B", "product_C", "count", "support"]]
 )
 
-print("\nТоп-10 трійок за Confidence:")
+print("\nTop 10 der Dreierkombinationen: Confidence-Werte:")
 print(
     triples_df.sort_values("support", ascending=False)
     .head(10)[["product_A", "product_B", "product_C", "count", "confidence_A", "confidence_B", "confidence_C"]]
 )
 
-# Network graph top-30 трійок
+# Netzwerk der 30 führenden Dreierkombinationen
 
 top_triples_30 = triples_df.sort_values("lift", ascending=False).head(30)
 
@@ -218,9 +218,9 @@ nx.draw(
     width=edge_widths
 )
 
-plt.title("Network Graph топ-зв'язків між трійками товарів")
+plt.title("Netzwerk der wichtigsten Dreierkombinationen")
 plt.show()
 
-print("\nВисновок по трійках:")
-print("Трійки з найбільшим lift можна використовувати для пакетних пропозицій.")
-print("Трійки з найбільшим support показують найчастіші комбінації товарів.")
+print("\nEinordnung der Dreierkombinationen:")
+print("Dreierkombinationen mit hohem Lift kommen für Paketangebote infrage.")
+print("Dreierkombinationen mit hohem Support zeigen häufig gemeinsam gekaufte Produkte.")

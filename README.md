@@ -1,108 +1,254 @@
-# 📊 Data Analytics E-Commerce Project | Team 1
+# 📊 E-Commerce-Geschäftsanalyse
 
-[![Project Type](https://img.shields.io/badge/Project-Educational_Material-orange?logo=readme&logoColor=white)](#)
-[![Python Version](https://img.shields.io/badge/Python-3.8%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
-[![Database](https://img.shields.io/badge/Database-SQLite-003B57?logo=sqlite&logoColor=white)](https://sqlite.org/)
-[![Framework](https://img.shields.io/badge/Data_Stack-Pandas%20%7C%20NumPy%20%7C%20Seaborn-150458?logo=pandas&logoColor=white)](https://pandas.pydata.org/)
+<p align="center"><strong>Python-DA-Team · Team 1</strong></p>
+<p align="center"><em>Warenkörbe · Rabatte und Marge · Sortiment · Vertrieb · Auffällige Bestellungen</em></p>
+<p align="center">
+  <img alt="Lernprojekt" src="https://img.shields.io/badge/Projekt-Lernmaterial-orange?style=flat-square">
+  <img alt="Getestet mit Python 3.11" src="https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square">
+  <img alt="SQLite-Datenbank" src="https://img.shields.io/badge/Datenbank-SQLite-003B57?style=flat-square">
+  <img alt="pandas und NumPy" src="https://img.shields.io/badge/Analyse-pandas_%7C_NumPy-150458?style=flat-square">
+  <img alt="Matplotlib und seaborn" src="https://img.shields.io/badge/Diagramme-Matplotlib_%7C_seaborn-174A70?style=flat-square">
+</p>
 
-
-Комплексний аналіз операційних, фінансових та маркетингових показників інтернет-магазину на основі даних СУБД SQLite. Проєкт створено як навчальний матеріал, що поєднує фінансовий аудит, дослідження асортименту (BCG), поведінкових патернів клієнтів (MBA), HR-метрики та антифрод-моніторинг.
-
----
-
-## 👥 Склад команди та зони відповідальності
-
-| Учасник | Напрямки дослідження & Зона відповідальності |
-| :--- | :--- |
-| **Serhii** | Аналіз скасованих замовлень, розробка алгоритмів антифрод-моніторингу. |
-| **Oksana** | Аналіз продуктового кошика (Market Basket Analysis), HR-аналітика. |
-| **Iryna** | Розрахунок еластичності цін, оцінка ефективності промоакцій та персоналу. |
-| **Dmytrii** | Побудова BCG-матриці, аналіз розподілу вартості чеків, сезонність продажів. |
+Analyse der operativen, finanziellen und vertrieblichen Kennzahlen eines Onlineshops auf Basis einer SQLite-Datenbank. Das gemeinsame Lernprojekt verbindet Warenkorbanalyse, Rabatt- und Margenauswertung, BCG-Portfolioklassifikation, Umsatzzeitreihen, Personalkennzahlen und die Untersuchung auffälliger Bestellaktivität.
 
 ---
 
-## 📂 Структура проєкту
+## 📋 Schnellnavigation
 
-* **online_store.db** - Основна реляційна база даних SQLite
-* **main.py** - Головний скрипт (консолідує всі завдання)
-* **README.md** - Технічна документація проєкту
-
-### Індивідуальні робочі файли учасників проєкту:
-* **1.1 Аналіз продуктового кошика... .py**
-* **1.2 Еластичність ціни та глибина знижки.py**
-* **1.3 Розподіл вартості замовлень та аномалії.py**
-* **1.4 Матриця BCG.py**
-* **1.5 Календар продажів.py**
-* **1.6 cancel orders.py**
-* **1.7 Sales Performance співробітників.py**
-* **Oksi_HR.py**
-* **Кріт-2 Шеф хоче один простий графік.py**
-* **anomalous_daily_customer_orders.py**
+| **Projekt kennenlernen** | **Mit dem Projekt arbeiten** | **Methodik verstehen** |
+| :-- | :-- | :-- |
+| [📌 Überblick](#project-overview) | [▶️ Installation und Start](#getting-started) | [📐 Kennzahlen](#technical-notes) |
+| [👥 Team](#team) | [📁 Projektstruktur](#project-structure) | [⚠️ Grenzen](#known-limitations) |
+| [🛠 Technologien](#technology-stack) | [🧩 Analysen](#features-modules) | [🔮 Weiterentwicklung](#roadmap) |
 
 ---
 
-## 📋 Специфікація завдань
+<a id="project-overview"></a>
 
-### 📈 Основний аналітичний пайплайн
+## 📌 Überblick
 
-| № | Завдання | Виконавець | Файл |
-| :---: | :--- | :--- | :--- |
-| **1.1** | Аналіз продуктового кошика (Market Basket Analysis) | Oksana | `1.1 Аналіз продуктового кошика... .py` |
-| **1.2** | Еластичність ціни та глибина знижки | Iryna | `1.2 Еластичність ціни та глибина знижки.py` |
-| **1.3** | Розподіл вартості замовлень та аномалії | Dmytrii | `1.3 Розподіл вартості замовлень та аномалії.py` |
-| **1.4** | Матриця BCG (Портфельний аналіз товарів) | Dmytrii | `1.4 Матриця BCG.py` |
-| **1.5** | Календар продажів та аналіз сезонності | Dmytrii | `1.5 Календар продажів.py` |
-| **1.6** | Аналіз скасованих замовлень (Churn Analysis) | Serhii | `1.6 cancel orders.py` |
-| **1.7** | Аналіз ефективності співробітників (Sales Performance) | Iryna | `1.7 Sales Performance співробітників.py` |
+**Ziel:** Aus zusammenhängenden Shopdaten nachvollziehbare Auswertungen für Sortiment, Marketing, Vertrieb und interne Prüfungen erstellen.
 
-### 🚨 Пріоритетні бізнес-кейси (Ad-hoc аналітика)
+Die Datenbank enthält **60.000 Bestellungen**, **166.355 Bestellpositionen**, **600 Produkte**, **6.080 Kunden** und **40 Mitarbeitende**. Die erfassten Bestelldaten reichen vom **29.01.2022 bis zum 31.12.2025**.
 
-* **HR-Аудит (`Oksi_HR.py`):** 
-  Розслідування інциденту від HR-відділу щодо аномальних нарахувань бонусів (`bonus > base_salary`). Скрипт знаходить відхилення, будує scatter plot з лінією y=x, агрегує дані за регіонами/посадами та перевіряє диспропорцію зарплат на однакових позиціях.
-* **Executive Dashboard (`Кріт-2 Шеф хоче один простий графік.py`):** 
-  Створення лаконічної візуалізації для Ради директорів щодо ефективності промоакцій. Скрипт розраховує сумарний revenue та discount, будує horizontal bar chart для ТОП-5 акцій та кодує кольором відсоток знижки.
-* **Fraud Detection (`anomalous_daily_customer_orders.py`):** 
-  Профайлінг клієнтів з екстремальною кількістю замовлень в межах однієї доби. Аналізується структура кошика, способи оплати та історія повернень для класифікації активності (Оптові закупівлі vs Шахрайство).
+> [!NOTE]
+> **Aktueller Stand:** `main.py` führt die sieben Hauptanalysen und drei zusätzlichen Geschäftsfälle nacheinander aus. Die Ausgabe besteht aus Konsolentabellen und Diagrammen. Es handelt sich um ein Lernprojekt, nicht um ein produktives Betrugserkennungs- oder Entscheidungsautomatisierungssystem.
+
+### Fachliche Fragen
+
+- Welche Produkte werden häufig zusammen gekauft?
+- Welche Rabattbereiche erzielen innerhalb der beobachteten Daten hohe Umsätze bei positiver Marge?
+- Welche Bestellungen und Verkaufstage fallen statistisch auf?
+- Wie unterscheiden sich Umsatzentwicklung und Kategorieanteile der Produkte?
+- Wo treten Stornierungen auf, und wie unterscheiden sich die Vertriebskennzahlen der Mitarbeitenden?
+- Welche Bonuszahlungen und Kundenaktivitäten sollten näher geprüft werden?
 
 ---
 
-## 📌 Ключові результати (Executive Summary)
+<a id="team"></a>
 
-1. **HR-безпека:** Локалізовано та вивантажено списки співробітників з підозрілим співвідношенням бонусу до окладу.
-2. **Антифрод:** Реалізовано логіку автоматичного скорингу клієнтів за рівнем добової активності та історією повернень.
-3. **Маркетинг:** Визначено оптимальні межі знижок, які забезпечують максимальну виручку без падіння загальної маржинальності нижче безпечного ліміту.
-4. **Управління асортиментом:** Сформовано списки категорій «Зірки» (для масштабування) та «Собаки» (кандидати на виведення з матриці BCG).
+## 👥 Team und Verantwortlichkeiten
 
----
-
-## 🛠 Технологічний стек
-
-* **Мова програмування:** Python 3.8+
-* **Обробка даних:** Pandas, NumPy
-* **Робота з БД:** SQLite3 (складні SQL-запити, агрегації, JOIN-операції)
-* **Графовий аналіз:** NetworkX, Itertools, Collections (побудова зв'язків між товарами)
-* **Візуалізація:** Matplotlib, Seaborn
+| **Mitglied** | **Analysebereiche** |
+| --- | --- |
+| **Serhii** | Stornierte Bestellungen und Untersuchung auffälliger Kundenaktivität |
+| **Oksana** | Warenkorbanalyse und HR-Analyse |
+| **Iryna** | Rabatt- und Margenanalyse sowie Vertriebsleistung der Mitarbeitenden |
+| **Dmytrii** | BCG-Portfolio, Verteilung der Bestellwerte und Saisonalität |
 
 ---
 
-## 🚀 Інструкція з розгортання та запуску
+<a id="features-modules"></a>
 
-### 1. Підготовка середовища
-Переконайтеся, що файл бази даних `online_store.db` знаходиться в корені проєкту (поруч із файлами завдань).
+## 🧩 Analysen und Geschäftsfälle
 
-### 2. Встановлення залежностей
-Для встановлення пакетів скопіюйте та запустіть у терміналі:
-`pip install pandas numpy matplotlib seaborn networkx`
+### Hauptanalysen
 
-### 3. Запуск проєкту
-Для запуска консолідованого аналітичного скрипту, який об'єднує всі модулі, виконайте:
-`python main.py`
+| **Nr.** | **Analyse** | **Ergebnis / Darstellung** | **Datei** |
+| :--: | --- | --- | --- |
+| 1.1 | Warenkorbanalyse | Produktpaare und Dreierkombinationen mit Support, Confidence und Lift; Heatmap und Netzwerke | [task_1_01_warenkorbanalyse.py](task_1_01_warenkorbanalyse.py) |
+| 1.2 | Rabatte und Marge | Korrelation zwischen Rabatt und Absatz; Vergleich von Rabattbereichen; Regressions- und Balkendiagramme | [task_1_02_rabatt_und_marge.py](task_1_02_rabatt_und_marge.py) |
+| 1.3 | Bestellwerte und Ausreißer | IQR, Z-Score, größte und kleinste Bestellungen; Histogramm und Boxplot | [task_1_03_bestellwerte_und_ausreisser.py](task_1_03_bestellwerte_und_ausreisser.py) |
+| 1.4 | BCG-Portfolio | Vergleich 2024/2025; Einteilung in Stars, Cashcows, Fragezeichen und Arme Hunde | [task_1_04_bcg_portfolio.py](task_1_04_bcg_portfolio.py) |
+| 1.5 | Umsatzkalender | Trend, Wochentagseffekt, Residuen, Ausreißer und Kalender-Heatmap | [task_1_05_umsatzkalender.py](task_1_05_umsatzkalender.py) |
+| 1.6 | Stornierte Bestellungen | Gesamtstornoquote, Verteilung nach Kategorie, Segment und Land; Wert stornierter Positionen | [task_1_06_stornierte_bestellungen.py](task_1_06_stornierte_bestellungen.py) |
+| 1.7 | Vertriebsleistung | Umsatz, Stornoquote, durchschnittlicher Bestellwert und Wiederkäufer je Mitarbeitendem | [task_1_07_vertriebsleistung.py](task_1_07_vertriebsleistung.py) |
+
+### Zusätzliche Geschäftsfälle
+
+| **Fall** | **Umsetzung** | **Datei** |
+| --- | --- | --- |
+| HR-Analyse | Bonuszahlungen oberhalb des Grundgehalts; durchschnittliche Boni nach Region und Position; Gehaltsunterschiede | [task_2_01_personalanalyse.py](task_2_01_personalanalyse.py) |
+| Übersicht für die Geschäftsleitung | Die fünf umsatzstärksten Rabattaktionen; Farbe kennzeichnet den hinterlegten Rabatt | [task_2_02_aktionsuebersicht.py](task_2_02_aktionsuebersicht.py) |
+| Auffällige Bestellaktivität | Tage mit maximaler Bestellanzahl pro Kunde; Warenkorb, Zahlungsarten, Retouren und Bestellhistorie | [task_2_03_auffaellige_bestellaktivitaet.py](task_2_03_auffaellige_bestellaktivitaet.py) |
+
+> [!IMPORTANT]
+> `task_2_01_personalanalyse.py` ist ein Arbeitsfragment. Es benötigt `pd`, `plt` und ein Dictionary `df` mit den bereits geladenen Tabellen `employees` und `employee_salaries`. Für den vollständigen HR-Ablauf einschließlich Datenimport den entsprechenden Abschnitt in `main.py` verwenden. Die übrigen Aufgabenskripte laden ihre Daten selbst.
 
 ---
 
-## 🔮 Подальші кроки розвитку (Roadmap)
+<a id="technology-stack"></a>
 
-* [ ] Інтеграція інтерактивного дашборду на базі **Streamlit** або **Power BI**.
-* [ ] Впровадження динамічного **RFM-сегментування** клієнтської бази.
-* [ ] Побудова прогнозних моделей продажів за допомогою **Prophet** / **ARIMA**.
-* [ ] Автоматизація розсилки щотижневих PDF-звітів керівництву.
+## 🛠 Technologien
+
+| **Aufgabe** | **Technologie** |
+| --- | --- |
+| Programmiersprache | Python |
+| Datenaufbereitung und Aggregation | pandas, NumPy |
+| Datenbankabfragen | SQLite und das Python-Modul `sqlite3` |
+| Diagramme | Matplotlib, seaborn |
+| Produktnetzwerke | NetworkX |
+| Kombinationen und Häufigkeiten | `itertools`, `collections` aus der Python-Standardbibliothek |
+
+Die Datei [requirements.txt](requirements.txt) enthält die Versionen der geprüften lokalen Umgebung. `sqlite3`, `itertools` und `collections` müssen nicht separat installiert werden.
+
+---
+
+<a id="project-structure"></a>
+
+## 📁 Projektstruktur
+
+```text
+ecommerce-business-analytics/
+├── README.md
+├── LICENSE
+├── requirements.txt
+├── online_store.db
+├── main.py
+├── task_1_01_warenkorbanalyse.py
+├── task_1_02_rabatt_und_marge.py
+├── task_1_03_bestellwerte_und_ausreisser.py
+├── task_1_04_bcg_portfolio.py
+├── task_1_05_umsatzkalender.py
+├── task_1_06_stornierte_bestellungen.py
+├── task_1_07_vertriebsleistung.py
+├── task_2_01_personalanalyse.py
+├── task_2_02_aktionsuebersicht.py
+└── task_2_03_auffaellige_bestellaktivitaet.py
+```
+
+`online_store.db` ist die vorhandene gemeinsame Datenquelle. Tabellen-, Spalten- und Variablennamen sowie Quelldaten bleiben in ihrer ursprünglichen Sprache erhalten. Beschreibungen, Kommentare, Ausgabemeldungen und explizite Diagrammbeschriftungen sind auf Deutsch. Namen und Kategorien aus der Datenquelle können daher weiterhin auf Englisch erscheinen.
+
+<details>
+<summary>📂 Zuordnung der bisherigen Dateinamen</summary>
+
+| **Bisheriger Name / Aufgabenkennung** | **Deutscher Dateiname** |
+| --- | --- |
+| 1.1 / Market Basket Analysis | `task_1_01_warenkorbanalyse.py` |
+| 1.2 / Preiselastizität und Rabatthöhe | `task_1_02_rabatt_und_marge.py` |
+| 1.3 / Bestellwertverteilung | `task_1_03_bestellwerte_und_ausreisser.py` |
+| 1.4 / BCG | `task_1_04_bcg_portfolio.py` |
+| 1.5 / Verkaufskalender | `task_1_05_umsatzkalender.py` |
+| `1.6 cancel orders.py` | `task_1_06_stornierte_bestellungen.py` |
+| 1.7 / Sales Performance | `task_1_07_vertriebsleistung.py` |
+| `Oksi_HR.py` | `task_2_01_personalanalyse.py` |
+| `krit_2_executive_dashboard.py` | `task_2_02_aktionsuebersicht.py` |
+| `anomalous_daily_customer_orders.py` | `task_2_03_auffaellige_bestellaktivitaet.py` |
+
+</details>
+
+---
+
+<a id="getting-started"></a>
+
+## ▶️ Installation und Start
+
+Geprüft mit **Python 3.11**. Die folgenden Befehle im Terminal ausführen.
+
+### 1. Projekt herunterladen
+
+```powershell
+git clone https://github.com/Python-DA-Team/ecommerce-business-analytics.git
+cd ecommerce-business-analytics
+```
+
+### 2. Umgebung vorbereiten
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+```
+
+### 3. Gesamte Analyse starten
+
+```powershell
+.\.venv\Scripts\python.exe main.py
+```
+
+Die Skripte suchen `online_store.db` im aktuellen Arbeitsverzeichnis. Deshalb die Befehle aus dem Projektordner starten. Diagrammfenster gegebenenfalls schließen, damit der Ablauf mit dem nächsten Abschnitt fortgesetzt wird.
+
+### Einzelne Analyse starten
+
+```powershell
+.\.venv\Scripts\python.exe task_1_06_stornierte_bestellungen.py
+```
+
+### Erwartete Ausgabe
+
+- **`main.py`:** Tabellen und Interpretationen in der Konsole sowie nacheinander angezeigte Diagramme.
+- **Bestellwertanalyse:** `orders_distribution_histogram.png` und `orders_value_boxplot.png` im aktuellen Arbeitsverzeichnis.
+- **Umsatzkalender:** `revenue_decomposition_linear.png`, `revenue_calendar_heatmap.png` und `category_seasonality_comparison.png` im aktuellen Arbeitsverzeichnis.
+
+Ein erneuter Start der beiden zuletzt genannten Einzelskripte überschreibt ihre gleichnamigen PNG-Dateien. Automatisch erzeugte Diagramme werden nicht in Git aufgenommen.
+
+---
+
+<a id="technical-notes"></a>
+
+## 📐 Kennzahlen und fachliche Definitionen
+
+| **Kennzahl / Verfahren** | **Berechnung im Projekt** |
+| --- | --- |
+| Positionswert nach Rabatt | `quantity × unit_price × (1 − discount)` |
+| Marge in der Rabattanalyse | `(unit_price × (1 − discount) − cost) × quantity` |
+| Margenquote | Marge ÷ Umsatz |
+| Ausgewählter Rabattbereich | Höchster beobachteter Umsatz je Kategorie unter den Bereichen mit positiver Marge und mindestens 20 % Margenquote |
+| Gesamtstornoquote | Eindeutige stornierte Bestellungen ÷ eindeutige Bestellungen |
+| BCG-Wachstum | Umsatzveränderung von 2024 auf 2025; bei fehlendem Vorjahresumsatz wird 0 eingesetzt |
+| BCG-Anteil | Produktumsatz 2025 ÷ Umsatz seiner Kategorie 2025 |
+| BCG-Grenzen | Median der Wachstumsraten und Median der Kategorieanteile |
+| IQR-Ausreißer | Bestellwert oberhalb von `Q3 + 1,5 × IQR` |
+| Z-Score-Ausreißer | Absoluter Z-Score größer als 3 |
+| Zeitreihentrend | Zentrierter gleitender Mittelwert über sieben Tage |
+| Auffällige Verkaufstage | Residuum außerhalb von Mittelwert ± drei Standardabweichungen |
+
+Die Rabattanalyse verwendet nur Bestellungen mit Status `completed`. Andere Analysen verwenden teilweise sämtliche Statuswerte. Die Kalenderanalyse berechnet Umsatz vor Rabatt als `unit_price × quantity`; ihre Werte sind deshalb nicht ohne Weiteres mit den Nettowerten anderer Module vergleichbar.
+
+### Prüfung der deutschen Version
+
+Die deutschen Skripte wurden auf Syntax geprüft und mit derselben Datenbank wie die ursprünglichen Skripte ausgeführt. Numerische Tabellen, Reihen und Kennzahlen wurden vor und nach der Übersetzung verglichen. SQL-Abfragen und Berechnungsstrukturen blieben unverändert; die vorhandene Datenbank wurde nicht verändert. Das HR-Arbeitsfragment wurde mit seinen erforderlichen Tabellen und Imports geprüft.
+
+---
+
+<a id="known-limitations"></a>
+
+## ⚠️ Einordnung und Grenzen
+
+1. **Rabattkorrelation statt kausaler Preiselastizität:** Die Analyse untersucht Zusammenhänge zwischen Rabatt und Absatz. Sie schätzt keine kausale Preiselastizität. Der gewählte Rabattbereich ist ein Ergebnis des vorliegenden Datensatzes und keine garantierte Optimierung für künftige Verkäufe.
+2. **BCG als interne Portfolionäherung:** Der Anteil bezieht sich auf den Umsatz innerhalb der eigenen Kategorie, nicht auf externe Marktanteile oder den stärksten Wettbewerber. Medianwerte bestimmen die Quadranten.
+3. **Bestellungen und Positionen:** Die Gesamtstornoquote zählt eindeutige Bestellungen. Kategorie-, Länder- und Segmentauswertungen zählen dagegen teilweise Bestellpositionen. Diese Kennzahlen sind unterschiedlich zu interpretieren.
+4. **Warenkorblogik:** Paare benötigen mindestens acht gemeinsame Vorkommen, Dreierkombinationen mindestens zwei. Einzelprodukthäufigkeiten werden aus den Positionszeilen gezählt. Bei mehrfachen Zeilen desselben Produkts pro Bestellung entspricht die Berechnung deshalb nicht vollständig einer transaktionsbasierten Assoziationsanalyse. Die Confidence-Ausgabe der Dreierkombinationen zeigt Werte für nach Support ausgewählte Kombinationen.
+5. **Saisonalität:** Die Kategorieauswahl für Sport und Elektronik verwendet fest hinterlegte Zeichenmuster auf Kategorie-IDs. Diese Zuordnung muss vor einer Übertragung auf andere Daten geprüft werden. Die Zerlegung ist eine einfache Glättung mit Wochentagseffekt.
+6. **Auffällige Aktivität:** Bei mehreren gleich auffälligen Kunden-Tagen wird der erste Treffer näher untersucht. Die anschließende Einordnung ist eine einfache Heuristik und kein Betrugsnachweis.
+7. **HR-Kennzahlen:** Auffällige Boni oder Gehaltsunterschiede erfordern eine fachliche Prüfung. Die Spalte `range` berechnet hier Mittelwert minus Minimum und nicht Maximum minus Minimum. Das separate HR-Arbeitsfragment setzt eine vorbereitete Python-Sitzung voraus.
+8. **Darstellung:** Geldbeträge übernehmen die vorhandene Einheit des Datensatzes und der Skripte; es erfolgt keine Währungsumrechnung. Die deutsche Übersetzung ändert weder Quelldaten noch Berechnungsregeln.
+
+---
+
+<a id="roadmap"></a>
+
+## 🔮 Mögliche Weiterentwicklung
+
+Die folgenden Punkte sind Ideen und noch nicht umgesetzt:
+
+- [ ] Interaktives Dashboard mit Streamlit oder Power BI.
+- [ ] RFM-Segmentierung der Kunden.
+- [ ] Prognosemodelle für Umsatzzeitreihen.
+- [ ] Automatisch erzeugte periodische PDF-Berichte.
+- [ ] Einheitliche Umsatz- und Stornodefinitionen über alle Module.
+- [ ] Validierte Kategoriezuordnungen und robustere Behandlung von Sonderfällen.
+
+### Lizenz
+
+Das Projekt steht unter der [MIT-Lizenz](LICENSE). Der originale englische Lizenztext und der Copyright-Vermerk bleiben erhalten.

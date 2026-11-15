@@ -122,7 +122,7 @@ venv.bak/
 .pixi/
 
 # Poetry / Pipenv / UV
-# (lock-файлы обычно рекомендуется хранить в Git)
+# (Lockdateien sollten normalerweise in Git versioniert werden)
 # poetry.lock
 # Pipfile.lock
 # uv.lock
@@ -166,3 +166,13 @@ __marimo__/
 
 # Abstra
 .abstra/
+
+# Automatisch erzeugte Analysebilder
+orders_distribution_histogram.png
+orders_value_boxplot.png
+revenue_decomposition_linear.png
+revenue_calendar_heatmap.png
+category_seasonality_comparison.png
+
+# Lokale Arbeitsanweisungen
+AGENTS.md

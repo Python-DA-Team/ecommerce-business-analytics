@@ -1,9 +1,9 @@
-#1.2 Еластичність ціни та глибина знижки:
-#Для кожної категорії проаналізувати, як глибина знижки (discount %) впливає на кількість проданих одиниць та маржу.
-#Завдання:
-#- Розрахувати коефіцієнт кореляції між discount % та quantity по категоріях
-#- Визначити оптимальний діапазон знижки, що максимізує revenue без втрати margin
-#Візуалізація: - Scatter plot (discount % vs quantity) з лінією регресії - Facet по категоріях
+# 1.2 Rabatthöhe, Absatz und Marge
+# Zusammenhang zwischen Rabatt, Absatzmenge und Marge je Kategorie untersuchen.
+# Aufgaben:
+# Korrelation zwischen Rabatt in Prozent und Absatzmenge je Kategorie berechnen.
+# Umsatzstarke Rabattbereiche mit positiver Marge ermitteln.
+# Visualisierung: Streudiagramm mit Regressionslinie und Teilgrafiken je Kategorie.
 
 
 import sqlite3
@@ -36,7 +36,7 @@ WHERE o.status = 'completed'
 df = pd.read_sql(query, conn)
 conn.close()
 
-# Підготовка даних
+# Daten vorbereiten
 
 df["discount_percent"] = df["discount"] * 100
 
@@ -54,13 +54,13 @@ df["margin"] = (
 
 df["margin_rate"] = df["margin"] / df["revenue"]
 
-print("\nПерші рядки:")
+print("\nErste Datenzeilen:")
 print(df.head())
 
-print("\nОпис знижок:")
+print("\nDeskriptive Statistik der Rabatte:")
 print(df["discount_percent"].describe())
 
-# 1. Кореляція discount % та quantity по категоріях
+# 1. Korrelation zwischen Rabatt und Absatzmenge je Kategorie
 
 correlation_by_category = (
     df.groupby("category")
@@ -72,10 +72,10 @@ correlation_by_category = (
       .sort_values("discount_quantity_corr", ascending=False)
 )
 
-print("\nКореляція між discount % та quantity по категоріях:")
+print("\nKorrelation zwischen Rabatt in Prozent und Absatzmenge je Kategorie:")
 print(correlation_by_category)
 
-# 2. Діапазони знижок
+# 2. Rabattbereiche
 
 bins = [0, 5, 10, 15, 20, 25, 50, 100]
 labels = [
@@ -96,7 +96,7 @@ df["discount_range"] = pd.cut(
     right=False
 )
 
-# 3. Аналіз revenue та margin по категоріях і знижках
+# 3. Umsatz und Marge nach Kategorie und Rabattbereich
 
 discount_analysis = (
     df.groupby(["category", "discount_range"], observed=True)
@@ -115,24 +115,24 @@ discount_analysis["margin_rate_total"] = (
     discount_analysis["margin"] / discount_analysis["revenue"]
 )
 
-print("\nАналіз revenue та margin по діапазонах знижок:")
+print("\nUmsatz und Marge nach Rabattbereich:")
 print(discount_analysis)
 
-# 4. Перевірка збиткових діапазонів
+# 4. Rabattbereiche mit negativer Marge prüfen
 
 negative_margin = discount_analysis[
     discount_analysis["margin"] < 0
 ]
 
-print("\nДіапазони, де margin від'ємна:")
+print("\nRabattbereiche mit negativer Marge:")
 print(negative_margin)
 
-# 5. Оптимальний діапазон знижки
+# 5. Umsatzstärkster zulässiger Rabattbereich
 
-# Логіка:
-# 1. revenue має бути високим
-# 2. margin має бути позитивною
-# 3. margin_rate_total має бути не нижче 20%
+# Auswahlregeln:
+# 1. Möglichst hoher Umsatz
+# 2. Positive Marge
+# 3. Gesamte Margenquote von mindestens 20 %
 
 safe_discount_analysis = discount_analysis[
     (discount_analysis["margin"] > 0) &
@@ -147,7 +147,7 @@ optimal_discount = (
     .reset_index(drop=True)
 )
 
-print("\nОптимальний діапазон знижки по категоріях:")
+print("\nUmsatzstärkster zulässiger Rabattbereich je Kategorie:")
 print(
     optimal_discount[
         [
@@ -163,7 +163,7 @@ print(
 )
 
 
-# 6. Scatter plot: discount % vs quantity з регресією
+# 6. Streudiagramm: Rabatt und Absatzmenge mit Regressionslinie
 
 sns.set_theme(style="whitegrid")
 
@@ -178,13 +178,13 @@ g = sns.lmplot(
     line_kws={"color": "red"}
 )
 
-g.set_axis_labels("Discount, %", "Quantity")
+g.set_axis_labels("Rabatt (%)", "Absatzmenge")
 g.set_titles("{col_name}")
 
 plt.tight_layout()
 plt.show()
 
-# 7. Аналіз margin по діапазонах знижок
+# 7. Margenquote nach Rabattbereich
 
 
 plt.figure(figsize=(12, 6))
@@ -200,18 +200,18 @@ plt.axhline(
     0.20,
     linestyle="--",
     color="red",
-    label="Minimum safe margin rate 20%"
+    label="Mindestmargenquote: 20 %"
 )
 
-plt.title("Margin rate по діапазонах знижок")
-plt.xlabel("Discount range")
-plt.ylabel("Margin rate")
+plt.title("Margenquote nach Rabattbereich")
+plt.xlabel("Rabattbereich")
+plt.ylabel("Margenquote")
 plt.xticks(rotation=45)
 plt.legend()
 plt.tight_layout()
 plt.show()
 
-# 8. Revenue по діапазонах знижок
+# 8. Umsatz nach Rabattbereich
 
 plt.figure(figsize=(12, 6))
 
@@ -222,25 +222,25 @@ sns.barplot(
     hue="category"
 )
 
-plt.title("Revenue по діапазонах знижок")
-plt.xlabel("Discount range")
-plt.ylabel("Revenue")
+plt.title("Umsatz nach Rabattbereich")
+plt.xlabel("Rabattbereich")
+plt.ylabel("Umsatz")
 plt.xticks(rotation=45)
 plt.legend()
 plt.tight_layout()
 plt.show()
 
-# 9. Текстові висновки
+# 9. Ergebnisse zusammenfassen
 
-print("\nВисновки по оптимальних знижках:")
+print("\nErgebnisse der Rabattbereichsauswahl:")
 
 for _, row in optimal_discount.iterrows():
     print(
-        f"Категорія: {row['category']} | "
-        f"Оптимальний діапазон: {row['discount_range']} | "
-        f"Revenue: {row['revenue']:.2f} | "
-        f"Margin: {row['margin']:.2f} | "
-        f"Margin rate: {row['margin_rate_total']:.2%}"
+        f"Kategorie: {row['category']} | "
+        f"Ausgewählter Rabattbereich: {row['discount_range']} | "
+        f"Umsatz: {row['revenue']:.2f} | "
+        f"Marge: {row['margin']:.2f} | "
+        f"Margenquote: {row['margin_rate_total']:.2%}"
     )
 
 
