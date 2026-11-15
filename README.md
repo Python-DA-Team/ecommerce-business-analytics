@@ -63,6 +63,16 @@ Die Datenbank enthält **60.000 Bestellungen**, **166.355 Bestellpositionen**, *
 
 ## 🧩 Analysen und Geschäftsfälle
 
+### Persönlicher Beitrag von Serhii
+
+Die Teamzuordnung nennt zwei Analysebereiche:
+
+- [Stornierte Bestellungen](task_1_06_stornierte_bestellungen.py): SQL-Joins, Gesamtstornoquote, Auswertungen von Positionen nach Kategorie, Segment und Lieferland sowie Diagramme.
+- [Auffällige Bestellaktivität](task_2_03_auffaellige_bestellaktivitaet.py): maximale tägliche Bestellanzahl, Untersuchung des ersten ausgewählten Kunden-Tages, Bestellhistorie, Zahlungsarten und Retouren.
+
+Die übrigen Analysebereiche sind gemeinsame Projektleistungen mit den oben genannten Zuständigkeiten. Die Rollenzuordnung ist dokumentiert; sie wird nicht allein aus dem Vorhandensein von Code abgeleitet.
+
+
 ### Hauptanalysen
 
 | **Nr.** | **Analyse** | **Ergebnis / Darstellung** | **Datei** |
@@ -215,6 +225,12 @@ Ein erneuter Start der beiden zuletzt genannten Einzelskripte überschreibt ihre
 
 Die Rabattanalyse verwendet nur Bestellungen mit Status `completed`. Andere Analysen verwenden teilweise sämtliche Statuswerte. Die Kalenderanalyse berechnet Umsatz vor Rabatt als `unit_price × quantity`; ihre Werte sind deshalb nicht ohne Weiteres mit den Nettowerten anderer Module vergleichbar.
 
+### SQL und Auswertungsumfang
+
+Die beiden persönlichen Analysebeiträge lesen Daten mit `pd.read_sql()` aus SQLite. Die Abfragen verknüpfen Bestellungen, Kunden, Positionen, Produkte und Kategorien mit `JOIN`; die Aktivitätsanalyse ergänzt Zahlungen per `LEFT JOIN`. Retouren eines ausgewählten Kunden werden über eine parametrisierte Abfrage mit `WHERE o.customer_id = ?` geladen. Gruppierungen und Kennzahlen werden anschließend überwiegend mit pandas berechnet.
+
+Die Zahlungsabfrage verbindet auf Bestellebene. Bei mehreren Zahlungszeilen je Bestellung können Positionswerte vervielfacht werden. Vor der Übertragung auf andere Daten ist daher die Kardinalität dieser Verknüpfung zu prüfen. `nunique(order_id)` schützt die Bestellanzahl, nicht die Summen der Positionswerte.
+
 ### Prüfung der deutschen Version
 
 Die deutschen Skripte wurden auf Syntax geprüft und mit derselben Datenbank wie die ursprünglichen Skripte ausgeführt. Numerische Tabellen, Reihen und Kennzahlen wurden vor und nach der Übersetzung verglichen. SQL-Abfragen und Berechnungsstrukturen blieben unverändert; die vorhandene Datenbank wurde nicht verändert. Das HR-Arbeitsfragment wurde mit seinen erforderlichen Tabellen und Imports geprüft.
@@ -227,10 +243,10 @@ Die deutschen Skripte wurden auf Syntax geprüft und mit derselben Datenbank wie
 
 1. **Rabattkorrelation statt kausaler Preiselastizität:** Die Analyse untersucht Zusammenhänge zwischen Rabatt und Absatz. Sie schätzt keine kausale Preiselastizität. Der gewählte Rabattbereich ist ein Ergebnis des vorliegenden Datensatzes und keine garantierte Optimierung für künftige Verkäufe.
 2. **BCG als interne Portfolionäherung:** Der Anteil bezieht sich auf den Umsatz innerhalb der eigenen Kategorie, nicht auf externe Marktanteile oder den stärksten Wettbewerber. Medianwerte bestimmen die Quadranten.
-3. **Bestellungen und Positionen:** Die Gesamtstornoquote zählt eindeutige Bestellungen. Kategorie-, Länder- und Segmentauswertungen zählen dagegen teilweise Bestellpositionen. Diese Kennzahlen sind unterschiedlich zu interpretieren.
+3. **Bestellungen und Positionen:** Der Wert stornierter Positionen beschreibt nicht realisierten Bestellwert, keinen nachgewiesenen Gewinnverlust.  Die Gesamtstornoquote zählt eindeutige Bestellungen. Kategorie-, Länder- und Segmentauswertungen zählen dagegen teilweise Bestellpositionen. Diese Kennzahlen sind unterschiedlich zu interpretieren.
 4. **Warenkorblogik:** Paare benötigen mindestens acht gemeinsame Vorkommen, Dreierkombinationen mindestens zwei. Einzelprodukthäufigkeiten werden aus den Positionszeilen gezählt. Bei mehrfachen Zeilen desselben Produkts pro Bestellung entspricht die Berechnung deshalb nicht vollständig einer transaktionsbasierten Assoziationsanalyse. Die Confidence-Ausgabe der Dreierkombinationen zeigt Werte für nach Support ausgewählte Kombinationen.
 5. **Saisonalität:** Die Kategorieauswahl für Sport und Elektronik verwendet fest hinterlegte Zeichenmuster auf Kategorie-IDs. Diese Zuordnung muss vor einer Übertragung auf andere Daten geprüft werden. Die Zerlegung ist eine einfache Glättung mit Wochentagseffekt.
-6. **Auffällige Aktivität:** Bei mehreren gleich auffälligen Kunden-Tagen wird der erste Treffer näher untersucht. Die anschließende Einordnung ist eine einfache Heuristik und kein Betrugsnachweis.
+6. **Auffällige Aktivität:** Der Einstieg sucht das globale Maximum täglicher Bestellzahlen und führt keine systematische statistische Bewertung aller Kunden durch.  Bei mehreren gleich auffälligen Kunden-Tagen wird der erste Treffer näher untersucht. Die anschließende Einordnung ist eine einfache Heuristik und kein Betrugsnachweis.
 7. **HR-Kennzahlen:** Auffällige Boni oder Gehaltsunterschiede erfordern eine fachliche Prüfung. Die Spalte `range` berechnet hier Mittelwert minus Minimum und nicht Maximum minus Minimum. Das separate HR-Arbeitsfragment setzt eine vorbereitete Python-Sitzung voraus.
 8. **Darstellung:** Geldbeträge übernehmen die vorhandene Einheit des Datensatzes und der Skripte; es erfolgt keine Währungsumrechnung. Die deutsche Übersetzung ändert weder Quelldaten noch Berechnungsregeln.
 
@@ -248,6 +264,10 @@ Die folgenden Punkte sind Ideen und noch nicht umgesetzt:
 - [ ] Automatisch erzeugte periodische PDF-Berichte.
 - [ ] Einheitliche Umsatz- und Stornodefinitionen über alle Module.
 - [ ] Validierte Kategoriezuordnungen und robustere Behandlung von Sonderfällen.
+
+### Prüfstand der Dokumentation
+
+Am 15.11.2026 wurden die Repository-Struktur, Teamzuordnung und die Implementierung der Storno- und Aktivitätsanalyse mit dieser Beschreibung abgeglichen. Die historische Ausführungsprüfung der Übersetzung ist oben beschrieben; diese Dokumentationsaktualisierung ist kein erneuter vollständiger Lauf aller Aufgaben. Die aufgeführten fachlichen Grenzen sind weiterhin zu beachten.
 
 ### Lizenz
 
